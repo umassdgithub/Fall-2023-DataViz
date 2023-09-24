@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Scatter Plot</title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        table, td{
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<h3>
+Exit and Remove
+</h3>
+<table>
+    <tr>
+        <td> Java Script Code</td>
+        <td> Output</td>
+    </tr>
+    <tr>
+    <td>
+<textarea id="txtArea1" rows="15" cols="60">
+let myData =[{x:0,y:5,len:20},{x:0,y:10,len:16},
+            {x:0,y:15,len:16},{x:0,y:20,len:22},
+            {x:0,y:25,len:13},{x:0,y:30,len:8}]
+svg.selectAll('rect')
+    .data(myData)
+    .enter()
+    .append('rect')
+    .attr('x',function(d){return d.x})
+    .attr('y',function(d){return d.y})
+    .attr('height',5)
+    .attr('width',function(d){return d.len})
+    .style('fill','red')
+    .style('stroke-width','.1')
+    .style('stroke','black')
+    .style('opacity',.5)
+</textarea>
+<br>
+<hr>
+<textarea id="txtArea2" rows="15" cols="60">
+let myData_2 =[
+    {x:0,y:20,len:20},{x:0,y:5,len:16},
+    {x:0,y:15,len:16},{x:0,y:10,len:28},
+    ]
+svg.selectAll('rect')
+    .data(myData_2)
+    .exit()
+    .remove();
+
+svg.selectAll('rect')
+    .transition()
+    .duration(1000)
+    .attr('x',function(d){return d.x})
+    .attr('y',function(d){return d.y})
+    .attr('height',5)
+    .attr('width',function(d){return d.len})
+    .style('fill','red')
+    .style('stroke-width','.1')
+    .style('stroke','black')
+    .style('opacity',.5)
+
+
+
+</textarea>
+<input type="button" onclick="MakeChange()" value="Run">
+        </td>
+        <td style="vertical-align: top">
+            <svg width="400px" height="500px" viewBox="0 0 80 80" style="background-color: aliceblue;alignment: top" >
+            </svg>
+        </td>
+    </tr>
+</table>
+<script>
+    let svg = d3.selectAll('svg');
+
+    let txtArea1 = document.getElementById('txtArea1');
+    eval(txtArea1.value);
+    function MakeChange()
+    {
+      d3.selectAll("svg > *").remove();
+      let txtArea2 =document.getElementById('txtArea2');
+      eval(txtArea1.value)
+      eval(txtArea2.value);
+    }
+</script>
+</body>
+</html>

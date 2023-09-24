@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Scatter Plot</title>
+    <script src="../libs/d3/d3.min.js"></script>
+
+    <style>
+        svg{
+            border: solid gold 2px;
+            margin:30px;
+        }
+        h3{
+            font-family: Helvetica;
+        }
+        .line{
+            fill:lightblue;
+            stroke-width: 1px;
+            stroke: steelblue;
+            fill-opacity: .2;
+   }
+    </style>
+</head>
+<body>
+<h3>
+    Line Plot (Minor Styling)
+</h3>
+<div id="container" style="width: 100%"></div>
+<script>
+
+
+    let svg = d3.selectAll('#container')
+        .append('svg')
+        .attr('width','60vw')
+        .attr('height','30vw')
+        .attr('viewBox','0 0 750 500')
+    .style('background-color','#ffffff');
+    let margins = 30;
+    let width = 800 - 2 * margins;
+    let height = 500 - 2 * margins;
+
+    //step 1: Overview the data types and column names
+/*
+    let loadData = d3.csv('./../data/yahoo_finance.csv')
+        .then(function (d){
+            console.log(d)
+        })
+*/
+
+    //step 2: Make the data conversion
+    const loadData = d3.csv("./../data/yahoo_finance.csv",
+        function(d) {
+        return {
+        date: new Date(d.Date),
+        volume: Number(d.Volume),
+        high: Number(d.High),
+        low: Number(d.Low),
+        open: Number(d.Open),
+        close: Number(d.Close)}
+    })
+
+    //step 3: Load data to visualize
+    loadData.then(data => {
+
+        //step 4: define scale functions for x and y axis
+        let x = d3.scaleTime()
+            .domain(d3.extent(data, function(d) { return d.date; }))
+            .range([margins, width]);
+        let y = d3.scaleLinear()
+            .domain([d3.min(data, function(d) { return d.close; }),
+                     d3.max(data, function(d) { return d.close; })])
+            .range([height, margins]);
+
+        //step 5: define line function for [date] and [close] variable
+        let line = d3.line()
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.close); });
+        //step 6: append a path elements
+        svg.append("path")
+            .data([data])
+            .attr("class", "line")
+            .attr("d", line); // line function automatically makes d attribute
+        ///////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+        ///////////////////////// Styling starts from here ///////////
+        //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
+
+        // Step 7 add x and yaxis
+        svg.append("g")
+            .attr("transform", "translate("+ '0' + "," + height + ")")
+            .call(d3.axisBottom(x));
+
+        svg.append("g")
+            .attr("transform", "translate("+ margins + "," + '0' + ")")
+            .call(d3.axisLeft(y));
+
+    });
+
+
+</script>
+</body>
+</html>

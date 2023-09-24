@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Scatter Plot</title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        table, td{
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<h3>
+    Scale to the limits
+</h3>
+<table>
+    <tr>
+        <td> Java Script Code</td>
+        <td> Output</td>
+    </tr>
+    <tr>
+        <td>
+<textarea id="txtArea1" rows="15" cols="60">
+svg.selectAll('rect')
+    .data(myData)
+    .enter()
+    .append('rect')
+    .attr('x',function(d){return d.x})
+    .attr('y',function(d){return d.y})
+    .attr('height',5)
+    .attr('width',function(d){return d.len})
+    .style('fill','red')
+    .style('stroke-width','.1')
+    .style('stroke','black')
+    .style('opacity',.5)
+    .exit()
+</textarea>
+            <br>
+            <hr>
+            <textarea id="txtArea2" rows="15" cols="60">
+// calculate max,min X of viewBox
+let viewBox_maxX = d3.select('SVG').attr('viewBox').split(' ')[2]
+let viewBox_minX = d3.select('SVG').attr('viewBox').split(' ')[0]
+
+// calculate max,min values of len
+let len_max = d3.max(myData, function(d) { return d.len; });
+let len_min = d3.min(myData, function(d) { return d.len; })
+// linear scale
+let margin = 5
+let lenScale = d3.scaleLinear().domain([len_min,len_max])
+                                .range([viewBox_minX+margin,viewBox_maxX-2*margin])
+svg.selectAll('rect')
+    .data(myData)
+
+    .attr('y',function(d){return d.y})
+    .attr('height',5)
+    .transition()
+    .duration(1000)
+    .attr('x',function(d){return d.x+margin})
+    .attr('width',function(d){return lenScale(d.len)})
+    .style('fill','red')
+    .style('stroke-width','.1')
+    .style('stroke','black')
+    .style('opacity',.5)
+    .exit()
+</textarea>
+            <input type="button" onclick="MakeChange()" value="Run">
+        </td>
+        <td style="vertical-align: top">
+            <svg width="400px" height="500px" viewBox="0 0 80 80" style="background-color: aliceblue;alignment: top" >
+            </svg>
+        </td>
+    </tr>
+</table>
+<script>
+    let svg = d3.selectAll('svg');
+    let myData =[{x:0,y:5,len:20},{x:0,y:10,len:16},
+        {x:0,y:15,len:16},{x:0,y:20,len:22},
+        {x:0,y:25,len:13},{x:0,y:30,len:8}]
+
+    let txtArea1 = document.getElementById('txtArea1');
+    eval(txtArea1.value);
+    function MakeChange()
+    {
+        d3.selectAll("svg > *").remove();
+        let txtArea2 =document.getElementById('txtArea2');
+        eval(txtArea1.value)
+        eval(txtArea2.value);
+    }
+</script>
+</body>
+</html>

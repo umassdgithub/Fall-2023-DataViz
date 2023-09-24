@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Scatter Plot</title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        table, td{
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<h3>
+Color transition
+</h3>
+<table>
+    <tr>
+        <td> Java Script Code</td>
+        <td> Output</td>
+    </tr>
+    <tr>
+    <td>
+<textarea id="txtArea1" rows="15" cols="60">
+let myData = [{x:2,y:4},{x:6,y:8},
+              {x:3,y:12},{x:3,y:12},
+              {x:15,y:15},{x:20,y:30}]
+svg.selectAll('rect')
+    .data(myData).enter()
+    .append('rect')
+    .attr('x',function(d){return d.x})
+    .attr('y',function(d){return d.y})
+    .attr('height',5)
+    .attr('width',5)
+    .style('fill','blue')
+    .style('stroke-width','.5')
+    .style('stroke','yellow');
+</textarea>
+<br>
+<hr>
+<textarea id="txtArea2" rows="15" cols="60">
+let rects = svg.selectAll('rect')
+    rects.transition()
+    .duration(2000)
+    .style('stroke-width','.3')
+    .style('stroke','green')
+    .style('opacity',.4)
+</textarea>
+<input type="button" onclick="MakeChange()" value="Run">
+        </td>
+        <td style="vertical-align: top">
+            <svg width="400px" height="500px" viewBox="0 0 80 80" style="background-color: aliceblue;alignment: top" >
+            </svg>
+        </td>
+    </tr>
+</table>
+<script>
+    let svg = d3.selectAll('svg');
+    let txtArea1 = document.getElementById('txtArea1');
+    eval(txtArea1.value);
+    function MakeChange()
+    {
+      d3.selectAll("svg > *").remove();
+      let txtArea2 =document.getElementById('txtArea2');
+      eval(txtArea1.value)
+      eval(txtArea2.value);
+    }
+</script>
+</body>
+</html>

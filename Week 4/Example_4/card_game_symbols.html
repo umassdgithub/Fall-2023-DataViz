@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Interactive Scatter Plot</title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        table, td{
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+<h3>
+selectAll, data and exit()
+</h3>
+<table>
+    <tr>
+        <td> Java Script Code</td>
+        <td> Output</td>
+    </tr>
+    <tr>
+    <td>
+<textarea id="txtArea1" rows="15" cols="60">
+
+svg.selectAll('text')
+    .data(cards_symbols)
+    .enter()
+    .append('text')
+    .attr('x',function(d,i){return 0})
+    .attr('y',function(d,i){return 5*i})
+    .style('font-size','2.5pt')
+    .text(function(d){return d})
+    .style("fill", function(d) {
+      return "\u2665\u2666".indexOf(d[1]) < 0 ? "black" : "red";
+    })
+</textarea>
+<br>
+<hr>
+<textarea id="txtArea2" rows="15" cols="60">
+shuffleArray(cards_symbols)
+svg.selectAll('text')
+    .data(cards_symbols)
+    .transition()
+    .duration(1000)
+    .attr('x',function(d,i){return 0})
+    .attr('y',function(d,i){return 5*i})
+    .style('font-size','2.5pt')
+    .text(function(d){return d})
+    .style("fill", function(d) {
+      return "\u2665\u2666".indexOf(d[1]) < 0 ? "black" : "red";
+    })
+
+</textarea>
+<input type="button" onclick="MakeChange()" value="Run">
+        </td>
+        <td style="vertical-align: top">
+            <svg width="400px" height="500px" viewBox="0 0 80 80" style="background-color: aliceblue;alignment: top" >
+            </svg>
+        </td>
+    </tr>
+</table>
+<script>
+    // from stackoverflow
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+
+    let cards_symbols = [
+        "J\u2665", "J\u2666", "J\u2663", "J\u2660",
+        "K\u2665", "K\u2666", "K\u2663", "K\u2660",
+        "Q\u2665", "Q\u2666", "Q\u2663", "Q\u2660",
+        "A\u2665", "A\u2666", "A\u2663", "A\u2660"]
+
+    let svg = d3.selectAll('svg');
+    let txtArea1 = document.getElementById('txtArea1');
+    eval(txtArea1.value);
+    function MakeChange()
+    {
+      d3.selectAll("svg > *").remove();
+      let txtArea2 =document.getElementById('txtArea2');
+      eval(txtArea1.value)
+      eval(txtArea2.value);
+    }
+</script>
+</body>
+</html>
