@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SVG Arc Path Attributes</title>
+    <link href="style.css" rel="stylesheet">
+    <script src="script.js" defer></script>
+</head>
+<body>
+<div class="title">
+    <h1>
+    SVG Arc Path Attributes
+    </h1>
+</div>
+
+<div class="container">
+
+    <div class="item">
+        <form>
+            <div class="input-container">
+            <label for="movetoX">MovetoX:</label>
+            <input type="number" id="movetoX" name="movetoX" required>
+            </div>
+            <div class="input-container">
+            <label for="movetoY">MovetoY:</label>
+            <input type="number" id="movetoY" name="movetoY" required>
+            </div>
+
+            <div class="input-container">
+            <label for="rX">rX:</label>
+            <input type="number" id="rX" name="rX" required>
+            </div>
+            <div class="input-container">
+            <label for="rY">rY:</label>
+            <input type="number" id="rY" name="rY" required>
+            </div>
+            <div class="input-container">
+            <label for="endX">EndX:</label>
+            <input type="number" id="endX" name="endX" required>
+            </div>
+            <div class="input-container">
+            <label for="endY">EndY:</label>
+            <input type="number" id="endY" name="endY" required>
+            </div>
+
+            <div class="input-container">
+            <label for="rotate">Rotate:(0&deg; - 180&deg;)</label>
+            <input type="range" id="rotate" name="rotate" min="0" max="180" step="1" value="0">
+            </div>
+
+            <label for="largeArcFlag">LargeArcFlag:</label>
+            <select id="largeArcFlag" name="largeArcFlag">
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select><br><br>
+            <button id="update">Update</button>
+        </form>
+    </div>
+    <div class="item">
+        <svg width="400" height="400" viewBox="0 0 100 100">
+            <path></path>
+            <text x="20" y="10">Hello</text>
+        </svg>
+    </div>
+</div>
+</body>
+</html>

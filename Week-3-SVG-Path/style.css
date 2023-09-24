@@ -1,0 +1,68 @@
+body{
+    /*https://www.zekagraphic.com/16-beautiful-color-gradient-inspiration/*/
+    background: linear-gradient(135deg, #014871, #DFEDE2);
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    color: antiquewhite;
+}
+path{
+    stroke-width: 1;
+    stroke: purple;
+    fill: transparent;
+}
+svg{
+    background-color: whitesmoke;
+}
+svg text{
+    font-size: .3rem;
+}
+.container{
+    background: linear-gradient(30deg,black,gray);
+    padding: 20px;
+
+    display: flex;
+
+    justify-content: space-around;
+
+    align-items: center;
+    border: solid 1px #333;
+    box-shadow: 10px 5px 5px #222;
+    max-width: 1200px;
+    min-width: 600px;
+    border-radius: 30px;
+}
+
+.input-container {
+    margin-right:10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+input{
+    border-radius: 5px;
+    border: solid 1px white;
+}
+
+
+#update{
+    width: 250px;
+    height: 40px;
+}
+svg{
+    border-radius: 10px;
+}
+input{
+    font-size: 1.1rem;
+}
+.title{
+    color: #ffffff;
+}
+h1{
+    font-size: 3rem;
+}
