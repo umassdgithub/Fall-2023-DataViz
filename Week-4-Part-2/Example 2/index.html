@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Custom Line function</title>
+    <script src="../libs/d3/d3.min.js"></script>
+</head>
+<body>
+<h3>
+    Custom Line Function
+</h3>
+<div width="100%">
+<svg id="main" width="100%" height="100%" viewBox="0 0 1000 800">
+</svg>
+</div>
+
+
+
+
+
+<script>
+    let svg = d3.select('svg#main')
+    let X = d3.range(0,1000,100)
+
+
+    function plot(X,Y,container=svg,c='black',lw='1px')
+    {
+        let dataSet = d3.map(X,function (d,i){
+            return {x:d,y:Y[i]}
+        })
+        let line = d3.line()
+            .x(function(d) { return d.x; })
+            .y(function(d) { return d.y; });
+
+        container.append("path")
+            .data([dataSet])
+            .attr("d",line)
+            .attr("fill",'none')
+            .style("stroke",c)
+            .style("stroke-width",lw.toString()+"px")
+    }
+    plot(X,X,svg,c='red',lw=2)
+
+</script>
+
+</body>
+</html>
+
+
+
