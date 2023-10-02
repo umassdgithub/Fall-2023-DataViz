@@ -207,9 +207,9 @@ h1{
            .data([data])
            .enter()
            .append("path")
-           .attr("d",d=>LineGen_max(d))
+           .attr("d",d=>LineGen_max(d));
 
-
+        /* ----- adding Legend --------*/
        let legendColors = svg.append("g").attr("class","legend").attr("transform","translate(0,20)");
         legendColors.append("text")
             .text("Temperature C")
@@ -224,6 +224,8 @@ h1{
            .append("rect")
            .attr("width","20")
            .attr("height","20")
+           .attr("rx","5px")
+
            .attr("fill",d=>colorScale(d))
             legendColors
                 .append('text')
@@ -231,7 +233,7 @@ h1{
                 .attr("class","legend")
                 .attr("text-anchor", "middle")
                 .attr("dx",10)
-                .attr("dy",12)
+                .attr("dy",13)
         let legendLines = svg.append("g").attr("class","legendLines")
             .attr("transform","translate(700,20)");
 
