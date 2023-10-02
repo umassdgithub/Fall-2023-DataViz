@@ -7,42 +7,39 @@
 </head>
 <body>
 <h3>
-    Custom Line Function
+    Making a Line Function
 </h3>
 <div width="100%">
-  <!--
 <svg id="main" width="100%" height="100%" viewBox="0 0 1000 800">
-
-</svg> -->
+</svg>
 </div>
-
-
-
-
 
 <script>
     let svg = d3.select('svg#main')
     let X = d3.range(0,1000,100)
-    d3.select("body").append('svg').attr("width","50vw")
-        .attr("height","30vw")
-        .attr("viewBox","0 0 1000 800")
-        .style("background-color","steelblue")
 
-    function plot(X,Y,container=svg,c='black',lw='1px')
+
+    function plot(X,Y,container=svg,color='black',lineWidth='1px',lineStyle="solid")
     {
-        let dataSet = d3.map(X,function (d,i){
-            return {x:d,y:Y[i]}
-        })
         let line = d3.line()
-            .x(function(d) { return d.x; })
-            .y(function(d) { return d.y; });
+            .x(d=>d.x)
+            .y(d=>d.y);
 
+        // Combine the two arrays in to one array of objects
+        let dataSet = d3.map(X,(d,i)=>({x:d,y:Y[i]}))
+
+        //
         container.append("path")
             .data([dataSet])
             .attr("d",line)
             .attr("fill",'none')
-            .style("stroke",c)
-            .style("stroke-width",lw.toString()+"px")
+            .style("stroke",color)
+            .style("stroke-width",lineWidth.toString()+"px")
+        if(lineStyle==="stroke-dasharray"){
+            container.style("stroke-width",lineWidth.toString()+"px")
+        }
+
+
     }
     plot(X,X,svg,c='red',lw=2)
 

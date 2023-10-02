@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3 Line Generator</title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        svg{
+            border: solid #a5a5f5 1px
+        }
+        .container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        body{
+            background: linear-gradient(135deg, #014871, #DFEDE2);
+            font-family: sans-serif;
+            color: white;
+            margin: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h2>
+    d3 Line Generator
+</h2>
+</div>
+    <div class="container">
+<p>
+
+    The line generator function helps automate the conversion of data points to line elements:<br/>
+    <a href="https://github.com/d3/d3-shape">See details here</a>
+</p>
+    </div>
+
+            <div class="container">
+                <svg id="line" width="50vw" height="40vw" viewBox="0 0 1000 800" style="background: #fafafa">
+                </svg>
+            </div>
+
+
+
+            <div class="container">
+                <h2>
+                    d3 lineRadial Generator
+                </h2>
+            </div>
+
+
+<div class="container">
+    <svg id="radialLine" width="50vw" height="40vw" viewBox="0 0 1000 800" style="background: #fafafa">
+    </svg>
+</div>
+
+
+<script>
+    const svg1 = d3.select('svg#line')
+    const X1 = d3.range(300,600,10); // from 300 to 800 with steps of 10
+
+
+    const dataSet1 = d3.map(X1,function (d){
+        return {x:d,y:d}
+    })
+
+    const line = d3.line()
+        .x(d=>d.x)
+        .y(d=>d.y);
+    svg1.append("path")
+        .data([dataSet1])
+        .attr("d",line)
+        .attr("fill",'none')
+        .style("stroke","black")
+        .style("stroke-width","5px")
+
+</script>
+
+<script>
+    const svg2 = d3.select('svg#radialLine')
+    const X2 = d3.range(10,300,5); // from 300 to 800 with steps of 10
+
+
+    const dataSet2 = d3.map(X2,function (d,i){
+        return {
+            dataAngle:i*(Math.PI/12), // in radian
+            dataRadius:d
+        }
+    })
+
+    const lineRadial = d3.lineRadial()
+        .angle(d=>d.dataAngle)
+        .radius(d=>d.dataRadius)
+
+
+    svg2.append("g")
+        .attr("transform",`translate(${500},${400})`)
+        .append("path")
+        .data([dataSet2])
+        .attr("d",d=>lineRadial(d))
+        .attr("fill",'none')
+        .style("stroke","black")
+        .style("stroke-width","2px")
+
+</script>
+
+
+</body>
+</html>
+
+
+

@@ -28,6 +28,8 @@
     let line = d3.line()
         .x(function(d) { return d.x; })
         .y(function(d) { return d.y; });
+
+
     svg.append("path")
         .data([dataSet])
         .attr("d",line)

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiline chart!</title>
+    <style>
+        .title{
+            font-size: x-large;
+            font-family: sans-serif;
+            margin: 50px;
+        }
+        path{
+            stroke: black;
+            stroke-width: 1px;
+            fill:none;
+        }
+        .clsTemp{
+            stroke: #660000;
+            stroke-width: 4px;
+            fill:none;
+        }
+        .clsCO2{
+            stroke: #feb24c;
+            stroke-width: 4px;
+            fill:none;
+        }
+        text{
+            font-size: 18pt;
+        }
+    </style>
+    <script src="./lib/d3.js"></script>
+</head>
+<body>
+<div class="title">
+    Multiline Chart
+</div>
+<div id="container">
+</div>
+<script>
+    d3.csv("./data/dt.csv",d=>(
+            {
+                date: new Date(d['date']),
+                CO2:Number(d['CO2 (ppm)']),
+                Temp:Number(d['GlobalTemperature'])
+            })
+    ).then(generateLineChart);
+    function generateLineChart(data){
+        const width=1000,height = 800;
+        const margin =  {top:70,right:70,bottom:70,left:70};
+        const svg = d3.select("#container")
+            .append("svg")
+            .attr("viewBox",`0 0 ${width} ${height}`)
+            .attr("width","50vw")
+            .attr("height","40vw");
+
+
+
+
+
+
+
+
+
+    }
+
+
+</script>
+</body>
+</html>
