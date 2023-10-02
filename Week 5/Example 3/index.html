@@ -10,7 +10,7 @@
             height: 60vh;
             background-color: #fefefe;
             margin: 10vw;
-            border: solid darkgray .3px;
+            border: solid darkgray 0px;
         }
         .axis text{
             font-family: sans-serif;
@@ -24,16 +24,15 @@
             stroke-dasharray: 10px 5px;
         }
         .TempMin{
-            stroke-width: 1px;
-            stroke: #66c2a5;
+            stroke-width: 3px;
+            stroke: #478aa8;
             fill:none;
         }
         .TempMax{
-            stroke-width: 1px;
-            stroke: #8da0cb;
+            stroke-width: 3px;
+            stroke: #cb8db7;
             fill:none;
         }
-
 
  .tick {
      stroke: gray;
@@ -47,123 +46,143 @@
 
 .LegendTempMin
 {
-    fill: #66c2a5;
+    fill: #478aa8;
 }
 .LegendTempAvg
 {
     fill:#fc8d62;
 }
-        .LegendTempMax
-        {
-            fill:#8da0cb;
-        }
-        .label{
+.LegendTempMax
+{
+    fill:#cb8db7;
+}
+.label{
             font-family: sans-serif;
             font-weight: bold;
-            fill:#8da0cb;
-            font-size: 12pt;
+            font-size: 27pt;
+            opacity: .1;
         }
-        body{
-            background: linear-gradient(135deg, #014871, #DFEDE2);
-            font-family: sans-serif;
-            color: white;
-            margin: 50px;
-        }
-        .container{
-            display: flex;
-            justify-content: center;
-        }
-        text{
-            font-size: 14pt;
-        }
+
+.legend{
+    font-family: sans-serif;
+    font-weight: normal;
+    font-size: 10pt;
+    fill:#fafafa;
+}
+.legendTitle{
+    font-family: sans-serif;
+    font-weight: normal;
+    font-size: 14pt;
+    fill:#5a5a5a;
+    
+}
+.lineLegendTitle{
+    font-family: sans-serif;
+    font-weight: normal;
+    font-size: 10pt;
+    fill:#5a5a5a;
+}
+h1{
+    font-family: sans-serif;
+    font-weight: normal;
+    fill:#5a5a5a;
+}
+.titleH1{
+    margin-left: 20px;
+    margin-top: 20px;
+}
     </style>
     <script src="lib/d3.js"></script>
 </head>
 <body>
-<div class="container">
-    <H1>
-        Boston Weather
-    </H1>
-</div>
+<h1 class="titleH1">Boston Temperature in 2021</h1>
 <script>
 
     const margins = {
-        top: 30,
+        top: 60,
         bottom: 60,
         left: 60,
-        right:30
+        right:60
     }
-
 
     const svg = d3.select("body").append("svg");
     const height= 600;
     const width =800;
 
     svg.attr("viewBox",`0,0,${width},${height}`)
-    d3.csv("./data/Boston_temperature_2021.csv",d=>{
-        return{
-            date: new Date(d.DATE),
-            t_min: Number(d.TMIN),
-            t_max: Number(d.TMAX),
-            t_avg: Number(d.TAVG),
-        }
-    }).then(data=>{
+    let grpData
 
-
+    // load and format the data
+    d3.csv("./data/Boston_temperature_2021.csv",d=>(
+        {date: new Date(d.DATE),
+        t_min: Number(d.TMIN),
+        t_max: Number(d.TMAX),
+        t_avg: Number(d.TAVG)}))
+        .then(data=>{
+        // Calculate Min Max of the Columns
         const date_min_max = d3.extent(data,d=>d.date)
         const Temp_min = d3.min(data,d=>d.t_min)
         const Temp_max = d3.max(data,d=>d.t_max)
         const Temp_min_max = [Temp_min,Temp_max];
-
         // scale time date
-        const xScale = d3.scaleTime()
+        const angleScale = d3.scaleTime()
             .domain(date_min_max)
-            .range([margins.left,800-margins.right]);
+            .range([0,2*Math.PI]);
 
-        // scale of temperature values
-        const yScale = d3.scaleLinear()
+        // scale of temperature values on the radius
+        const radiusScale = d3.scaleLinear()
             .domain(Temp_min_max)
-            .range([600-margins.bottom,margins.top]);
+            .range([60,(height-margins.top)/2]);
 
-        // adding axis generator for x and y axis
-        const xAxis = d3.axisBottom().scale(xScale);
-        const yAxis = d3.axisLeft().scale(yScale);
+        // for simplicity instead of grouping, 3 different generators are used
+        const LineGen_avg = d3.lineRadial()
+            .angle(d=>angleScale(d.date))
+            .radius(d=>radiusScale(d.t_avg)).curve(d3.curveCardinalClosed)
 
-        // append x axis
-        svg.append('g').
-        attr("class",'axis')
-            .attr("transform",
-                `translate(0, ${height-margins.bottom})`)
-            //.call(xAxis.tickFormat(lib.timeFormat("%B")))
-            .call(xAxis.tickFormat(d3.timeFormat("%b")))
-            .selectAll("text");
-            //.attr("transform","rotate(-50)")
-            //.attr("dy","10px")
-            //.attr("dx","-60px")
-        svg.append('g').attr("class",'axis')
-            .attr("transform",
-                `translate(${margins.left},0)`)
-            .call(yAxis);
-        // Line generator!
+       const LineGen_min = d3.lineRadial()
+            .angle(d=>angleScale(d.date))
+           .radius(d=>radiusScale(d.t_min)).curve(d3.curveCardinalClosed)
 
-        const LineGen_avg = d3.line()
-            .x(d=>xScale(d.date))
-            .y(d=>yScale(d.t_avg))
-
-        const LineGen_min = d3.line()
-            .x(d=>xScale(d.date))
-            .y(d=>yScale(d.t_min))
-
-        const LineGen_max = d3.line()
-            .x(d=>xScale(d.date))
-            .y(d=>yScale(d.t_max))
-
+       const LineGen_max = d3.lineRadial()
+           .angle(d=>angleScale(d.date))
+           .radius(d=>radiusScale(d.t_max)).curve(d3.curveCardinalClosed)
 
         // Use the line generator
-        // line mark
+        // Mark group is added to hold all pieces together
+        const Marks= svg.append('g').attr('transform',`translate(${width/2},${height/2})`)
+
+        /* ------------- Axis lines -----------------*/
+        // each circle will represent the following temperatures in C
+        const tempLines = [-10,-5,0,5,10,15,20,25,30,35,40]
+        // Step 1: make a new custom color scaling function
+        const colorScale = d3.scaleLinear()
+            .domain([-10,8,15,25,35,50])
+            .range(["black","navy","blue","green","orange","red"])
+            .interpolate(d3.interpolateRgb)
+        // step 2 add the circles to color-code the radial diagram
+        Marks.selectAll('.Axis')
+            .data(tempLines) // the data is the lines for each temperature
+            .enter()
+            .append('circle')
+            .attr("r",d=>radiusScale(d))    // use linearScale to set the radius of color-coding circles
+            .attr("fill","None") // make sure the circles are not filled
+            .attr("stroke",d=>colorScale(d)) // apply the color-coding to the stroke, and not to the fill
+            .attr("stroke-width",20.5)  // make the strokes wide enough
+            .attr("stroke-opacity",.1) //set the opacity of the color-coded strokes
+        // to add months to the chart
+        const formatTime = d3.timeFormat("%B"); // format function to get full month from the date
+        const xTick = Marks                     // bind the months data to the Marks
+            .selectAll(".ticks")                // select to add children
+            .data([... angleScale.ticks(12)])   // bind data, taken from the angleScale
+            .enter()
+            .append("text")                     // append text
+            .text(d=>formatTime(d))            // format the text
+            .attr("class","label")              // add the class for styling
+            .attr("text-anchor", "middle")      // anchor text to the middle of the text
+            .attr("transform", d=> (`rotate( ${angleScale(d)/Math.PI * 180-90} )
+                                    translate( ${180} ,0)`)) //rotate and transform the text
         /* -------------Add avg Temperature Line-----------------*/
-        const lineAvg = svg.append('g')
-            .attr("class","TempAvg");
+        const lineAvg=Marks.append('g').attr("class","TempAvg");
         lineAvg
             .selectAll('lines')
             .data([data])
@@ -171,72 +190,78 @@
             .append("path")
             .attr("d",d=>LineGen_avg(d))
 
-
-        /* ------------- Add min Temperature Line-----------------*/
-        const lineMin = svg.append('g')
-            .attr("class","TempMin");
-        lineMin
-            .selectAll('lines')
-            .data([data])
-            .enter()
-            .append("path")
-            .attr("d",d=>LineGen_min(d))
-
-
-        /* ------------- Add max Temperature Line-----------------*/
-        const lineMax = svg.append('g')
-            .attr("class","TempMax");
-        lineMax
-            .selectAll('lines')
-            .data([data])
-            .enter()
-            .append("path")
-            .attr("d",d=>LineGen_max(d))
+       /* ------------- Add min Temperature Line-----------------*/
+       const lineMin = Marks.append('g')
+           .attr("class","TempMin");
+       lineMin
+           .selectAll('lines')
+           .data([data])
+           .enter()
+           .append("path")
+           .attr("d",d=>LineGen_min(d))
+       /* ------------- Add max Temperature Line-----------------*/
+       const lineMax = Marks.append('g')
+           .attr("class","TempMax");
+       lineMax
+           .selectAll('lines')
+           .data([data])
+           .enter()
+           .append("path")
+           .attr("d",d=>LineGen_max(d))
 
 
-        /*---------------Adding legends -------------------------*/
-        const legend = svg.append('g')
-            .attr("class","legend")
-            .attr("transform","translate(0,50)")
-            .selectAll()
-            .data([{name:"Min",class:"LegendTempMin"},
-                {name:"Max",class:"LegendTempMax"},
-                {name:"Avg",class:"LegendTempAvg"}])
-            .enter()
-            .append("g")
-            .attr("class",d=>d.class)
-            .attr("transform",(d,i)=>{
-                return `translate(${width/1.3},${i*20})`
-            })
+       let legendColors = svg.append("g").attr("class","legend").attr("transform","translate(0,20)");
+        legendColors.append("text")
+            .text("Temperature C")
+            .attr("fill","black")
+            .attr("class","legendTitle")
+        legendColors =legendColors.selectAll('.Legend')
+           .data(tempLines)
+           .enter()
+           .append("g")
+           .attr("transform",(d,i)=>`translate(${40},${10+i*25})`)
+        legendColors
+           .append("rect")
+           .attr("width","20")
+           .attr("height","20")
+           .attr("fill",d=>colorScale(d))
+            legendColors
+                .append('text')
+                .text(d=>d)
+                .attr("class","legend")
+                .attr("text-anchor", "middle")
+                .attr("dx",10)
+                .attr("dy",12)
+        let legendLines = svg.append("g").attr("class","legendLines")
+            .attr("transform","translate(700,20)");
 
-        legend.append("rect")
-            .attr('width',"10px")
-            .attr('height',"2px")
+            legendLines.append("text")
+                .text("Lines")
+                .attr("fill","black")
+                .attr("class","legendTitle");
 
-        legend.append("text")
-            .text(d=>d.name)
-            .attr("dx","20px")
-            .attr("dy","5px")
-        /*---------------Adding Axis Label -------------------------*/
+            legendLines = legendLines.selectAll('.legendLines')
+                .data([
+                    {
+                        title:'Min Temperature',
+                        class:'LegendTempMin'},
+                    {
+                        title:'Avg Temperature',
+                        class:'LegendTempAvg'},
+                    {
+                        title:'Max Temperature',
+                        class:'LegendTempMax'
+                    }])
+                .enter()
+                .append("g")
+                .attr("transform",(d,i)=>`translate(${0},${30+i*45})`)
+            legendLines.append("rect")
+                .attr("width",80)
+                .attr("height",5)
+                .attr("class",d=>d.class)
 
-        // text label for the y axis
-        svg.append("text")
-            .attr("class","label")
-            .attr("transform", "rotate(-90)")
-            .attr("y",  0)
-            .attr("x",0 - (height / 2))
-            .attr("dy", "1em")
-            .style("text-anchor", "middle")
-            .text("Temperature");
-
-        // text label for the x axis
-        svg.append("text")
-            .attr("class","label")
-            .attr("transform",`translate(${width/2}, ${(height)-15})` )
-            .style("text-anchor", "middle")
-            .text("Date");
-
-    })
+            legendLines.append("text").text(d=>d.title).attr("dy",-5).attr("class","lineLegendTitle")
+        })
 
 </script>
 </body>
