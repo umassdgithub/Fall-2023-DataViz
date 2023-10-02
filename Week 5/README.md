@@ -13,7 +13,7 @@ In these example D3JS Generators are used to create stacked barchart, and area c
 </li>
 
 <li>
-<a href = "./Example 3/README.md">Example 3 </a>
+<a href = "Example 3/README.md">Example 3 </a>
 </li>
 
 </ul>
