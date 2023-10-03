@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3 Area Generator</title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+        .container{
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    d3 Area Generator
+</h1>
+<div class="container">
+    <svg id="main" width="50vw" height="40vw" viewBox="0 0 1000 800">
+    </svg>
+</div>
+<script>
+
+    const margin = {
+        top: 50,
+        bottom: 100,
+        left: 50,
+        right: 50
+    }
+
+    let data = [
+        {y01: 120, y02: 180, y03: 100, y04: 77},
+        {y01: 60,  y02: 185, y03: 105, y04: 123},
+        {y01: 100, y02: 215, y03: 110, y04: 131},
+        {y01: 80,  y02: 230, y03: 105, y04: 231},
+        {y01: 120, y02: 240, y03: 105, y04: 44}
+    ];
+    // Use scaleSequential to select colors
+    const colors_Category10 = d3.schemeCategory10;
+
+    // Step 1: stack Data
+    let stack = d3.stack()
+        .keys(['y01', 'y02', 'y03','y04']);
+    let stackedSeries = stack(data);
+
+
+    // find the max Y value
+    const yMax = d3.max(stackedSeries.map(d=>d3.max(d.map(dd=>d3.max(dd)))))
+
+    // find the min Y value
+    const yMin = d3.min(stackedSeries.map(d=>d3.min(d.map(dd=>d3.min(dd)))))
+
+    // Step 2: Scale function
+    const yScale = d3.scaleLinear()
+        .domain([yMin, yMax]) // data values are between [0 , sum of all y values]
+        .range([600, 100]);
+
+    // Step 3 area function
+    const area = d3.area()
+        .x((_, i)=> i * (800/stackedSeries.length))
+        .y0(d=>yScale(d[0]))
+        .y1(d=>yScale(d[1]))
+        .curve(d3.curveBasis); // in case you want to have smooth lines!
+
+    // step 4 select the svg element and append a group
+    const group = d3.select('svg#main').append("g")
+
+    // step 5, add the area paths to the group
+    group.selectAll('.paths')
+        .data(stackedSeries)        // bind data to the group
+        .enter()
+        .append('path')             // append "path" element to the group
+        .attr('fill', (d, i)=>colors_Category10[i])
+        .attr("opacity",0)
+        .transition()           // add animation-transition
+        .delay((_,i)=>i*1000)   // put delay between appearance of each element
+        .duration(2000)         // add duration
+        .attr("opacity",1)      // change opacity from 0 to 1 during 2 seconds
+        .attr('d', d=>area(d));       // set the attr of "d" equal values of d
+        //attr('d', area);       // in short it can be written as just the generator name
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+

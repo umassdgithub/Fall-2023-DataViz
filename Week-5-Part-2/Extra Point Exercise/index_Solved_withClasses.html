@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Precipitation in Massachusetts </title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+        .container{
+            padding: 30px;
+        }
+        .xAxis{
+            font-family: sans-serif;
+            font-size: 18px;
+        }
+        .xAxis .tick line{
+            stroke-width: .5;
+            stroke: #606060;
+        }
+
+        .xAxis path{
+            stroke: white;
+        }
+
+        .yAxis{
+            font-family: sans-serif;
+            font-size: 16px;
+        }
+        .yAxis .tick line{
+            stroke-width: .5;
+            stroke: #606060;
+        }
+        .yAxis path{
+            stroke: white;
+        }
+        .control{
+            margin-left: 100px;
+            margin-top: 50px;
+
+        }
+        .inActive{
+            fill-opacity: .20;
+        }
+        .legendText{
+            fill: #2f2f2f;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    Precipitation in Massachusetts
+</h1>
+<div class="control"></div>
+<div class="container">
+    <svg id="main" width="60vw" height="50vw" viewBox="0 0 1000 800">
+    </svg>
+</div>
+<script>
+    const margin = {top: 50, bottom: 100, left: 50, right: 50}
+    const width=1000,height=800;
+
+
+    // Load the data
+
+    d3.csv("../dataProcessing/Mass_Precipitation.csv",d=>(
+        {
+        "YEAR":parseInt(d.YEAR),
+        "STATION":d.STATION,
+        "JAN":Number(d.JAN),
+        "FEB":Number(d.FEB),
+        "MAR":Number(d.MAR),
+        "APR":Number(d.APR),
+        "MAY":Number(d.MAY),
+        "JUN":Number(d.JUN),
+        "JUL":Number(d.JUL),
+        "AUG":Number(d.AUG),
+        "SEP":Number(d.SEP),
+        "OCT":Number(d.OCT),
+        "NOV":Number(d.NOV),
+        "DEC":Number(d.DEC)}
+    )).then(allData=>{
+
+    const data= allData.filter(d=>d.STATION==="AMH307_Amherst");
+
+    AddDropDownMenu(allData);
+
+
+
+
+    let Years = data.map(d=>d.YEAR);
+    let months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
+
+    const stack = d3.stack()
+        .keys(months).offset(d3.stackOffsetWiggle);
+
+    let stackedSeries = stack(data);
+
+    const colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
+
+
+    //find the max Y value
+    let yMax = d3.max(stackedSeries.map(d=>d3.max(d.map(dd=>d3.max(dd)))))
+    // find the min Y value
+    let yMin = d3.min(stackedSeries.map(d=>d3.min(d.map(dd=>d3.min(dd)))))
+
+    // Step 2: Scale function
+    let yScale = d3.scaleLinear()
+        .domain([yMin, yMax]) // data values are between [0 , sum of all y values]
+        .range([height-margin.bottom, margin.top]);
+
+    let xScale =d3.scalePoint()
+        .domain(Years)
+        .range([margin.left,width-margin.right])
+
+    // Step 3 area function
+    let area = d3.area()
+        .x((_, i)=> xScale(Years[i]))
+        .y0(d=>yScale(d[0]))
+        .y1(d=>yScale(d[1]))
+        .curve(d3.curveBasis); // in case you want to have smooth lines!
+
+
+
+    // step 4 select the svg element and append a group
+    const group = d3.select('svg#main').append("g");
+    Years = data.map(d=>d.YEAR);
+    months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
+
+    //   // step 5, add the area paths to the group
+   // const streamGraphGroup = group.append("g").attr("class","areaChart")
+    const streamGraph = group.selectAll('path')
+        .data(stackedSeries)        // bind data to the group
+        .join('path')             // append "path" element to the group
+        .attr('fill', (_, i)=>colors[i])
+        .attr("class",(_,i)=>months[i])
+        .attr('d', area);       // in short it can be written as just the generator name
+
+
+        function calc_ratio(data){
+
+            if(data.length>30){
+                console.log("here")
+                return parseInt(data.length/10)
+            }
+            else if(data.length >20){
+                return parseInt(data.length/3)
+            }
+            else{
+                return 1
+            }
+        }
+    let ratio = calc_ratio(data);
+        let xAxisGenerator = d3.axisBottom(xScale)
+        .tickValues(xScale.domain().filter((d, i) => i%ratio===0))
+        .tickSize(-1*(height-margin.top-margin.bottom));
+    const yAxisGenerator = d3.axisLeft(yScale)
+                            .tickSize(-1*(width-margin.left-margin.right));
+
+    const xAxisGroup= group.append("g").attr("transform",`translate(${0},${height-margin.bottom})`);
+    xAxisGroup.attr("class","xAxis").call(xAxisGenerator)
+
+    const yAxisGroup= group.append("g")
+        .attr("class","yAxis")
+        .attr("transform",`translate(${margin.left},${0})`);
+    yAxisGroup.call(yAxisGenerator);
+
+    let state = {};
+    // add legend
+    const legends = group.append("g")
+        .attr("transform",`translate(${width/3},${margin.top/2})`)
+        .selectAll(".legends")
+        .data(months)
+        .enter().append("g")
+        .attr("transform",(_,i)=>`translate(${i*50},${0})`)
+        .attr("class","legends")
+    legends
+        .append("rect")
+        .attr("width","40px")
+        .attr("height","25px")
+        .attr("fill",(_,i)=>colors[i])
+        .attr("class",d=>d)
+        .on("click",(m,d)=>{
+            if(d in state){
+                if(state[d]===false){
+                    state[d]=true;
+                }
+                else{
+                    state[d]=false;
+                }
+            }
+            else{
+                state[d]=true;
+            }
+            console.log(state)
+            d3.selectAll(`.${d}`).classed("inActive",state[d])
+            console.log(m,d)
+        })
+
+   legends.append("text")
+       .attr("class","legendText")
+        .text(d=>d)
+        .attr("dy","18")
+        .attr("dx","2")
+       .attr("fill","black")
+       .style("pointer-events", "none");
+
+
+
+
+
+
+    function AddDropDownMenu(data){
+        // add select option to the page
+        const dataGroups = d3.group(allData,d=>d.STATION)
+        const Stations = Array.from(dataGroups.keys());
+        const selectOption = d3.selectAll('.control')
+            .append("select")
+            .attr("id","Cities")
+            .attr("name","Station")
+
+        // add the city stations to the html select-option control
+        selectOption.selectAll()
+            .data(Stations)
+            .enter()
+            .append("option")
+            .text(d=>d)
+
+        // Event handler for option change
+        document.querySelector("#Cities").onchange =  function(e){
+            const selectedCityStation= this.value;
+            // filter data based on the selection
+            const filteredData= data.filter(d=>d.STATION===selectedCityStation)
+            update(filteredData)
+        }
+
+
+        function update(data){
+            console.log(data)
+            stackedSeries = stack(data);
+            //find the max Y value
+            yMax = d3.max(stackedSeries.map(d=>d3.max(d.map(dd=>d3.max(dd)))))
+            // find the min Y value
+            yMin = d3.min(stackedSeries.map(d=>d3.min(d.map(dd=>d3.min(dd)))))
+
+            Years = data.map(d=>+d.YEAR);
+
+            // Step 2: Scale function
+            yScale = d3.scaleLinear()
+                .domain([yMin, yMax]) // data values are between [0 , sum of all y values]
+                .range([height-margin.bottom, margin.top]);
+
+            xScale =d3.scalePoint()
+                .domain(Years)
+                .range([margin.left,width-margin.right]);
+
+            ratio = calc_ratio(data)
+            console.log(ratio,data.length)
+            console.log(ratio)
+            xAxisGenerator = d3.axisBottom(xScale)
+                .tickValues(xScale.domain().filter((d, i) => i%ratio===0))
+                .tickSize(-1*(height-margin.top-margin.bottom));
+            xAxisGroup.call(xAxisGenerator)
+
+            area = d3.area()
+                .x((_, i)=> xScale(Years[i]))
+                .y0(d=>yScale(d[0]))
+                .y1(d=>yScale(d[1]))
+                .curve(d3.curveBasis); // in case you want to have smooth lines!
+
+            streamGraph
+                .data(stackedSeries)
+                .transition()
+                    .delay(1000)
+                    .duration(1500)
+                    .attr('d', area)
+                .end();
+        }
+
+
+    }
+    })
+
+
+
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+

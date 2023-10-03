@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>d3 Stack Generator</title>
+    <script src="../libs/d3/d3.min.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+    .container{
+        padding: 30px;
+    }
+    </style>
+</head>
+<body>
+<h1>
+    d3 Stack Generator
+</h1>
+
+<div class="container">
+    <svg id="main" width="50vw" height="40vw" viewBox="0 0 1000 800">
+    </svg>
+</div>
+
+<script>
+    // Dummy data for the example
+    const data = [
+        {y01: 120, y02: 180, y03: 100, y04: 77},
+        {y01: 60,  y02: 185, y03: 105, y04: 123},
+        {y01: 100, y02: 215, y03: 110, y04: 131},
+        {y01: 80,  y02: 230, y03: 105, y04: 231},
+        {y01: 120, y02: 240, y03: 105, y04: 44}
+    ];
+
+    // Use scaleSequential to select colors
+    const colors_Category10 = d3.schemeCategory10;
+    //console.log(colors_Category10);
+
+
+    // define the keys for d3.stack() to stack the data
+    const stack = d3.stack()
+        .keys(['y01', 'y02', 'y03','y04']);
+    stackedSeries = stack(data)
+    console.log(data) // Stacked array of the data:
+
+
+  const svg = d3.select('svg#main') // Select the svg element (statically added to the html code)
+
+   const groups = svg.selectAll('g') // append a group to the svg
+       .data(stackedSeries)            // bind data to the group
+       .enter()
+       .append('g')
+       .style('fill', (d, i)=>{
+           return colors_Category10[i]}) // fill the group with color based on the index of the array item
+
+
+    const stackGroups= groups.selectAll('.secondOrderValues') // since each data item is an array, we can bind each array to the newly added group element
+       .data(d=>d)
+       .enter()
+       .append('g')
+
+    stackGroups
+       .append('rect')                 // append one "rect" item to the group of groups
+       .attr('height', 50)             // height of each one of the rectangles
+       .attr('y', (_, i)=>(i * 55+20))    // distance from the top left (no scale is applied in this case)
+       .transition()                   // add transition
+       .duration(1500)                  // set duration of transition
+       .delay((d, i) => i * 20)        // delay each transition such that we see one bar at a time to appear
+       .attr('width', d=>Math.abs(d[1] - d[0])) // calculate the width of the stacks using each element's data values
+       .attr('x', (d,i)=>d[0])         // Move each bar to the correct x location of each stack part (will be d[0] of each second order array)
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
