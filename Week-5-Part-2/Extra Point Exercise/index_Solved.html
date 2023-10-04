@@ -131,9 +131,7 @@
                 return 1
             }
         }
-    let ratio = calc_ratio(data)
-
-        console.log(ratio,data.length)
+    let ratio = calc_ratio(data);
     let xAxisGenerator = d3.axisBottom(xScale)
         .tickValues(xScale.domain().filter((d, i) => i%ratio===0))
         .tickSize(-1*(height-margin.top-margin.bottom));

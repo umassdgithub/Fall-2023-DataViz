@@ -53,48 +53,31 @@
     // Load the data
 
     d3.csv("../dataProcessing/Dartmouth.csv").then(areaChart)
-
-
     function areaChart(data){
 
         const Years = data.map(d=>d.YEAR);
         const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
-
         const stack = d3.stack()
             .keys(months).offset(d3.stackOffsetWiggle);
-
         const stackedSeries = stack(data);
-
         const colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
-
         //find the max Y value
         const yMax = d3.max(stackedSeries.map(d=>d3.max(d.map(dd=>d3.max(dd)))))
-
         // find the min Y value
         const yMin = d3.min(stackedSeries.map(d=>d3.min(d.map(dd=>d3.min(dd)))))
-
-
         // Step 2: Scale function
         const yScale = d3.scaleLinear()
             .domain([yMin, yMax]) // data values are between [0 , sum of all y values]
             .range([height-margin.bottom, margin.top]);
-
         const xScale =d3.scalePoint()
             .domain(Years)
             .range([margin.left,width-margin.right])
-
-
-
-
         // Step 3 area function
         const area = d3.area()
             .x((_, i)=> xScale(Years[i]))
             .y0(d=>yScale(d[0]))
             .y1(d=>yScale(d[1]))
             .curve(d3.curveBasis); // in case you want to have smooth lines!
-
-
-
         // step 4 select the svg element and append a group
         const group = d3.select('svg#main').append("g")
 
@@ -110,23 +93,18 @@
             .duration(1000)         // add duration
             .attr("opacity",.9)      // change opacity from 0 to 1 during 2 seconds
             .attr('d', area);       // in short it can be written as just the generator name
-
         const xAxisGenerator = d3.axisBottom(xScale)
             .tickValues(xScale.domain().filter((d, i) => i%5===0))
             .tickSize(-1*(height-margin.top-margin.bottom))
         const yAxisGenerator = d3.axisLeft(yScale).tickSize(-1*(width-margin.left-margin.right))
-
         const xAxisGroup= group.append("g")
             .attr("class","xAxis")
             .attr("transform",`translate(${0},${height-margin.bottom})`)
         xAxisGroup.call(xAxisGenerator)
-
         const yAxisGroup= group.append("g")
             .attr("class","yAxis")
             .attr("transform",`translate(${margin.left},${0})`)
         yAxisGroup.call(yAxisGenerator)
-
-
         // add legend
         const legends = group.append("g")
             .attr("transform",`translate(${width/3},${margin.top/2})`)
@@ -136,14 +114,11 @@
             .attr("transform",(_,i)=>`translate(${i*50},${0})`)
             .attr("class","legends")
         legends
-
-
             .append("rect")
             .attr("width","40px")
             .attr("height","25px")
             .attr("rx","5px")
             .attr("fill",(_,i)=>colors[i]);
-
         // See use of text https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Texts
         legends.append("text")
             .text(d=>d)
@@ -151,9 +126,6 @@
             .attr("dx","4")
             .attr("fill","black")
             //.attr("text-anchor","middle")
-
-
-
     }
 
 
