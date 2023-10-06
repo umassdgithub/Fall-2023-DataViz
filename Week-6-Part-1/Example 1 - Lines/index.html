@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3 - Roads</title>
+    <script src="../libs/d3.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script src="lineLenghonMap.js" defer></script>
+    <style>
+        body{
+            margin: 0;
+            background: linear-gradient(135deg, #014871, #DFEDE2);
+            height: 100vh;
+        }
+        .roadType{
+            font-size: x-large;
+            font-family: sans-serif;
+        }
+        .container{
+            display: flex;
+            width: 100vw;
+            height: auto;
+            align-items: center;
+            justify-content: center;
+        }
+        .selectedRoad{
+            stroke-width: 5px;
+        }
+        svg{
+            border-radius: 50px;
+            border: solid gold 1px;
+            background-color: whitesmoke;
+        }
+        #information{
+            height: 30px;
+            color: whitesmoke;
+            text-anchor: middle;
+            font-family: sans-serif;
+            font-size: 2rem;
+            height: 2.5rem;
+            margin:30px
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="information"></div>
+</div>
+
+<div class="container">
+<svg></svg>
+</div>
+<script>
+    // Width and height of the SVG container
+    const width = 800;
+    const height = 600;
+
+    // Create the SVG element
+    const svg = d3.select("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    // Load the GeoJSON data
+    d3.json("../DataProcessing/roads.geojson").then(data=> {
+
+        // Create a GeoJSON feature collection
+        // console.log(data.features)
+        const features = data.features;
+
+        const roadLengths = features.map(d=>({
+            id:d.properties.LINEARID,
+            len: calculateLineLength(d.geometry.coordinates),
+        }
+        )
+    )
+        const lineWithScale =d3.scaleLinear()
+            .domain(d3.extent(roadLengths,d=>d.len))
+            .range([0.03,2])
+        const colorScale = d3.scaleLinear()
+            .domain(d3.extent(roadLengths,d=>d.len)) // road length as domain
+            .range(["blue", "red"]); // between blue and red
+
+
+        // Create a projection (you may need to adjust this based on your data)
+        // fitSize function is very effective in correctly placing the geoSpatial visualization
+        const projection = d3.geoMercator() // Mercator is a very common projection
+                            .fitSize([width, height], data);
+        // Create a path generator
+        const path = d3.geoPath(projection) // pass the projection to the geoPath to apply projection
+
+
+        // Add paths for LINESTRINGs
+        // Note that the roads dataset consists of Lines and not Shapes.
+        let mapCanvas = svg.append('g')
+        mapCanvas.selectAll("path")
+            .data(features)
+            .enter()
+            .append("path")
+            .attr("d", d=> path(d.geometry)) // each line in the array has a geometry parameter
+            .attr("stroke", (d,i)=>colorScale(roadLengths[i].len)) // Set the line color
+            .attr("stroke-width", (d,i)=>lineWithScale(roadLengths[i].len))
+            .attr("fill","none")    // Make sure there is no fill applied
+            .attr("class",d=>`c${d.properties.LINEARID}`)
+            .on("mouseover",(m,d)=>{
+                d3.select(`.c${d.properties.LINEARID}`).classed("selectedRoad",true)
+                d3.select("#information")
+                    .text(`${d.properties.FULLNAME} (${
+                       (roadLengths.filter(obj=>obj.id===d.properties.LINEARID)[0].len*0.62).toFixed(2)} mi)`)})
+
+            .on("mouseout",(m,d)=>{
+                d3.select(`.c${d.properties.LINEARID}`).classed("selectedRoad",false)
+            })
+
+        svg
+            .call(
+                d3.zoom()
+                    .extent([[0,0],[width,height]])
+                    .scaleExtent([0,8])
+                    .on("zoom",zoomed) // when the zoom even is triggered, zoomed function runs
+            )
+        function zoomed({transform}){
+            mapCanvas.attr("transform",transform); // when zoom function runs, it updates the transform of the mapCancas
+        }
+
+    });
+
+
+
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TopoJSON</title>
+    <script src="../libs/d3.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <style>
+        .geoPath{
+            fill:lightsteelblue;
+        }
+        .tag{
+            font-family: sans-serif;
+            font-size: 18pt;
+        }
+    </style>
+</head>
+<body>
+<div>
+check console.
+for topojson you must import the topojson convertor library
+<br>
+<textarea readonly="readonly" cols="60" rows="1">
+<script src="https://d3js.org/topojson.v1.min.js"></script>
+</textarea>
+</div>
+
+<svg width="50vw" height="60vw" viewBox="0 0 1000 800"></svg>
+<script>
+    // data source is: https://eric.clst.org/tech/usgeojson/
+    d3.json("../mapData/gz_2010_us_040_00_20m.topojson").then(topoJsonData=>{
+
+        const geoJsonData = topojson.feature(topoJsonData, topoJsonData.objects.gz_2010_us_040_00_20m);
+        /*  preview the data form */
+          console.log(geoJsonData);
+        /*  preview one of the features */
+         console.log(geoJsonData['features'][0]);
+        /* preview the geometry data */
+        console.log(geoJsonData['features'][0]['geometry']);
+        const onePolygon = geoJsonData['features'][0]['geometry'];
+        // use d3.geoPath with d3.geoAlbersUsa() projection to transform data
+        const thePathForPolygon = d3.geoPath(d3.geoAlbersUsa())(onePolygon)
+        // see the path data
+        console.log(thePathForPolygon)
+
+        // append path to the svg
+
+        d3.selectAll("svg").append("path")
+            .attr("class","geoPath")
+            .attr("d",thePathForPolygon)
+
+        // add text to center of the path
+        // anchor it to the middle
+        // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor
+        d3.select("svg").append("g")
+            .attr("transform",`translate(${d3.geoPath(d3.geoAlbersUsa()).centroid(onePolygon)})`)
+            .append("text")
+            .text("Arizona")
+            .attr("fill","black")
+            .attr("text-anchor","middle")
+            .attr("class","tag")
+
+
+
+    })
+</script>
+</body>
+</html>

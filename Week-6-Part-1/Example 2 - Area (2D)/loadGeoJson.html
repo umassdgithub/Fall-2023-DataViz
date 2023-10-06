@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GeoJSON</title>
+    <script src="../libs/d3.js"></script>
+    <style>
+        .geoPath{
+            fill:steelblue;
+        }
+    </style>
+</head>
+<body>
+<div>
+check console.
+</div>
+<svg width="50vw" height="60vw" viewBox="0 0 1000 800"></svg>
+<script>
+    // data source is: https://eric.clst.org/tech/usgeojson/
+    d3.json("../mapData/gz_2010_us_040_00_20m.json").then(geoJsonData=>{
+
+        /*  preview the data form */
+        //  console.log(geoJsonData);
+        /*  preview one of the features */
+        // console.log(geoJsonData['features'][0]);
+        /* preview the geometry data */
+        console.log(geoJsonData['features'][0]['geometry']);
+        const onePolygon = geoJsonData['features'][0]['geometry'];
+        // use d3.geoPath with d3.geoAlbersUsa() projection to transform data
+        const thePathForPolygon = d3.geoPath(d3.geoAlbersUsa())(onePolygon)
+        // see the path data
+        console.log(thePathForPolygon)
+
+        // append path to the svg
+
+        d3.selectAll("svg").append("path")
+            .attr("class","geoPath")
+            .attr("d",thePathForPolygon)
+
+
+
+
+
+    })
+</script>
+</body>
+</html>

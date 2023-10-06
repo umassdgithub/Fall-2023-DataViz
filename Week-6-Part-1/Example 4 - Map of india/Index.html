@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>D3 - Map</title>
+    <script src="../libs/d3.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <style>
+        .tooltipData{
+            font-family: sans-serif;
+            font-size: small;
+        }
+        #tooltip{
+            opacity: 0;
+            background-color: antiquewhite;
+            position: absolute;
+            width: 150px;
+            height: 60px;
+        }
+
+        #caption{
+            font-family: sans-serif;
+            margin: auto;
+            padding-top: 1%;
+            padding-bottom: 1%;
+            padding-left: 4%;
+            font-size: 24pt;
+        }
+        #container
+        {
+            width: 90vw;
+            height: 80vh;
+        }
+        #canvas
+        {
+            width: 90vw;
+            height: 80vh;
+            background-color: azure;
+        }
+        path.path_geo{
+            stroke-width: .5px;
+            stroke: black;
+        }
+    </style>
+
+</head>
+<body>
+<div id="caption">
+    India Base topojson
+</div>
+
+
+<div id="container">
+    <svg id="canvas" viewBox="0 0 1000 800">
+    </svg>
+</div>
+<div id="tooltip"></div>
+<script>
+    // select the svg element
+    let svg = d3.select('svg');
+    // data source https://www.diva-gis.org/gdata
+    let geojson = "data/inida_topojson.json";
+
+    d3.json(geojson).then(main)                                 // when dara loaded, function main runs.
+    function main(data){
+
+
+        let geoJson = topojson.feature(data,data.objects["IND_adm2-1"]).features;
+
+        const projection = d3.geoEquirectangular().fitSize([1000, 800], topojson.feature(data,data.objects["IND_adm2-1"]))
+        let geo_generator = d3.geoPath(projection)
+
+        let mapCanvas = svg.append('g')
+        mapCanvas.selectAll('path')
+        .data(geoJson)
+        .enter()
+        .append('path')
+        .attr("class","path_geo")
+        .attr("d",geo_generator)
+        .attr("fill","white")
+
+    svg
+        .call(
+            d3.zoom()
+                .extent([[0,0],[1000,800]])
+                .scaleExtent([0,8])
+                .on("zoom",zoomed) // when the zoom even is triggered, zoomed function runs
+        )
+    function zoomed({transform}){
+        mapCanvas.attr("transform",transform); // when zoom function runs, it updates the transform of the mapCancas
+    }
+    }
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
