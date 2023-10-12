@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cartogram Generator</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main{
+
+        }
+        .caption{
+            display: flex;
+            justify-content: center;
+            font-family: sans-serif;
+            font-size: 22pt;
+        }
+        nav{
+
+        }
+        footer{
+
+        }
+    </style>
+</head>
+<body>
+<header>
+
+</header>
+
+<main>
+    <div class="caption">
+        US Election by County.
+    </div>
+    <div>
+        <svg id="canvas" width="100vw" height="100vh" viewBox="0 0 1000 800">
+        </svg>
+    </div>
+</main>
+
+    <script>
+
+        const gop_color = "#FF0000";
+        const dem_color= "#0015BC";
+        // load the data sources:
+        // source 1
+        const use_election_data_2020 = "data/2020_US_County_Level_Presidential_Results.csv"
+        // source 2: US Census Counties geojson
+        const geoJson = "data/US_Election_Cartogram.json";
+
+
+        // Step 1: Load the datasets
+        Promise.all(
+            [
+                d3.json(geoJson),
+                d3.csv(use_election_data_2020)
+            ]
+            ,d3.autoType()).then(MapGenerator); // run function main and pass the loaded data to main
+
+        // Step 2: The main function will use the dataset, to generate the map
+        function MapGenerator(data)
+        {
+            //Step 3: set the sizes and the svg for the visualization
+            // const width = 1000 // not needed in this case
+            // const height= 800
+            const svg = d3.select('#canvas')
+
+            //Step 4: Set the projection, and the geoPath generator.
+            // In this example the projection is AlbersUsa
+            const projection = d3.geoAlbersUsa()
+            const geo_generator = d3.geoPath().projection(projection);
+
+            // get the features from the geojson dataset
+
+            // Step 5:
+            // Get GeoJson features
+            // Load the election data from the CSV file (Thematic Cartography)
+            const geoJson = data[0].features;
+            // Step 6:
+            // Group the data by the county_fips key
+            let election_data = d3.group(data[1],d=>d.county_fips);
+
+            // step 7
+            // generate the map, by adding path to the svg, and color code by the winning party in each county
+            const mapContainer = svg.append("g")
+                .selectAll('g')
+                .data(geoJson)
+                .enter()
+            // append the paths to the svg groups (the data is bound in the above line)
+            mapContainer.append("path")
+                .attr("d",d=>geo_generator(d))
+                .attr("fill",d=>{
+                    // de-structure the values in the json
+                    const {per_dem,per_gop} =  election_data.get(d.properties.GEOID)[0]
+                    return per_dem>per_gop?dem_color: gop_color;
+
+                })
+                .attr("fill-opacity", d=> {
+                    const {per_dem,per_gop} =  election_data.get(d.properties.GEOID)[0]
+                    return per_dem>per_gop?per_dem:per_gop
+                })
+                .attr("stroke","black")
+                .attr("stroke-opacity",".3")
+                .attr("stroke-width","1")
+        }
+    </script>
+
+<footer>
+
+</footer>
+</body>
+</html>

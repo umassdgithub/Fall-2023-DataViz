@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Simple Zoom Function</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        #container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+</div>
+<script>
+    const width = 1000,height =800
+    const svg = d3.select("#container")
+        .append("svg")
+        .attr("width","100vw")
+        .attr("height","100vh")
+        .attr("viewBox",`0 0 ${width} ${height}`)
+
+    const main = svg.append('g')
+        .attr('id',"main")
+
+
+    main.append("g")
+        .attr("transform",`translate(${width/2-50},${height/2-50})`)
+    main.selectAll('g')
+        .data(d3.range(100))
+        .join('g')
+        .attr("transform",()=>`translate(${Math.floor((1+Math.random())*(width/3))},${Math.floor((1+Math.random())*(height/3))})`)
+        .append("circle")
+        .attr("r","10")
+        .attr("fill","steelblue")
+        .attr("opacity",".5")
+
+    svg.call(
+        d3.zoom()
+            .extent([[0,0],[1000,800]])
+            .scaleExtent([1,12])
+            .on('zoom',d=>{
+                    main.attr("transform",d.transform)
+            }
+            )
+    )
+
+</script>
+
+
+</body>
+</html>

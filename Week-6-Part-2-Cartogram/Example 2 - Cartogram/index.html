@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cartogram Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+            flex-direction: column;
+        }
+        .caption{
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            font-family: sans-serif;
+            font-size: 22pt;
+        }
+      .control{
+          margin-top: 10px;
+      }
+      .control .label{
+
+      }
+    </style>
+</head>
+<body>
+<header>
+
+</header>
+
+<main>
+    <div class="caption">
+        US Election by County.
+    </div>
+    <div class="control">
+        <button name="change" id="btnSwitch" class="btn btn-success" style="width: 200px">Choropleth</button>
+    </div>
+    <div id="canvas">
+    </div>
+</main>
+
+    <script>
+
+        let gop_color = "#FF0000";
+        let dem_color= "#0015BC";
+        // load the data sources:
+        // source 1
+        let use_election_data_2020 = "data/2020_US_County_Level_Presidential_Results.csv"
+        // source 2: US Census Counties geojson
+        let geoJson = "data/US_Election_Cartogram.json";
+        //
+        //const NormalTopoJSON = "data/us_counties_topo.json"
+        const NormalTopoJSON = "data/counties.json"
+        // Step 1: Load the datasets
+        Promise.all(
+            [
+                d3.json(geoJson),
+                d3.csv(use_election_data_2020),
+                d3.json(NormalTopoJSON)
+
+            ]
+            ,d3.autoType()).then(MapGenerator); // run function main and pass the loaded data to main
+
+        // Step 2: The main function will use the dataset, to generate the map
+        function MapGenerator(data)
+        {
+
+            //Step 3: set the sizes and the svg for the visualization
+            // const width = 1000 // not needed in this case
+            // const height= 800
+            const svg = d3.selectAll('#canvas')
+                .append("svg")
+                .attr("width","100vw")
+                .attr("height","100vh")
+                .attr("viewBox","0 0 1000 800")
+
+            //Step 4: Set the projection, and the geoPath generator.
+            // In this example the projection is AlbersUsa
+            const projection = d3.geoAlbersUsa()
+            const geo_generator = d3.geoPath().projection(projection);
+
+            // get the features from the geojson dataset
+
+            // Step 5:
+            // Get GeoJson features
+            // Load the election data from the CSV file (Thematic Cartography)
+            const geoJsonCartoGram = data[0].features;
+            // const geoJsonNormal = topojson.feature(data[2],data[2].objects.cb_2018_us_county_20m).features;
+            const geoJsonNormal = data[2].features
+            console.log(geoJsonNormal)
+
+            // Step 6:
+            // Group the data by the county_fips key
+            let election_data = d3.group(data[1],d=>d.county_fips);
+
+            // step 7
+            // generate the map, by adding path to the svg, and color code by the winning party in each county
+
+            function update(){
+                mapContainer
+                    .transition()
+                    .duration(1000)
+                    .attr("d",d=>geo_generator(d))
+                    .attr("fill",d=>{
+                            try{
+                                const {per_dem,per_gop} =  election_data.get(d.properties.GEOID)[0]
+                                return per_dem>per_gop?dem_color: gop_color;
+                            }
+                            catch (e){
+                                return "gray";
+                            }
+                            })
+                    .attr("fill-opacity", d=> {
+                        try{
+                            const {per_dem,per_gop} =  election_data.get(d.properties.GEOID)[0]
+                            return per_dem>per_gop?per_dem:per_gop
+                        }
+                        catch (e){
+                            return .5;
+                        }
+                    })
+                    .attr("stroke","black")
+                    .attr("stroke-opacity",".3")
+                    .attr("stroke-width","1")
+
+
+            }
+
+            let mapContainer =svg.selectAll('.g')
+                .data(geoJsonNormal)
+                .join("path") // instead of enter().append() we can use join()
+            update()
+
+
+            const button = document.querySelector('#btnSwitch')
+            button.onclick=
+                function(e){
+                    let dt = "";
+                    if(e.target.innerText==="Choropleth"){
+                        dt = geoJsonCartoGram
+                        e.target.innerText ="Cartogram"
+                    }
+                    else{
+                        dt = geoJsonNormal
+                        e.target.innerText ="Choropleth"
+                    }
+                    mapContainer = mapContainer
+                        .data(dt)
+                        .join("path");
+
+                    update()
+
+            }
+
+
+
+
+
+        }
+
+
+
+
+
+    </script>
+
+<footer>
+
+</footer>
+</body>
+</html>
