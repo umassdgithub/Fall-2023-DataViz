@@ -17,18 +17,34 @@
             flex-direction: column;
         }
         .caption{
-            margin-top: 20px;
+
             display: flex;
             justify-content: center;
             font-family: sans-serif;
-            font-size: 22pt;
+            font-weight: bold;
+            font-size: 2rem;
+            color: gray;
+            margin-top: 3rem;
         }
       .control{
-          margin-top: 10px;
+          margin-top: 1rem;
+          margin-bottom: 1rem;
       }
       .control .label{
 
       }
+
+
+        .container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    .btn-secondary{
+        background-color: lightgray;
+        color:black;
+        border-color: transparent;
+    }
     </style>
 </head>
 <body>
@@ -38,10 +54,10 @@
 
 <main>
     <div class="caption">
-        US Election by County.
+        US Election by County
     </div>
     <div class="control">
-        <button name="change" id="btnSwitch" class="btn btn-success" style="width: 200px">Choropleth</button>
+        <button name="change" id="btnSwitch" class="btn btn-secondary" style="width: 150px">Choropleth</button>
     </div>
     <div id="canvas">
     </div>
