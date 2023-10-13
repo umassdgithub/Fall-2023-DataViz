@@ -21,7 +21,7 @@
 4. **Page Styling:** Add a title (H1) for the assignment at the top center of the page and your name below it (H3). Style the page and center the SVG using a div (10/100 points).
 
 5. **GitHub Webpage:** Create a GitHub webpage for the visualization (10/100 points).
-6. **Bonus Point** Color code the Counties by Gini-index (2017).
+6. **Bonus Point** Color code the Counties by Gini-index 2017 (+20 points).
 
 Note: You only need the topojson file for this assignment.
 
