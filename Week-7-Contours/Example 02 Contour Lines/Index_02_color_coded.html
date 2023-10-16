@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic C Color Coded</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+<svg viewBox="0 0 200 200">
+</svg>
+<script>
+    /************************************************************************************
+    // step 1. add svg element to html file -- set viewBox and width and height
+    // step 2. select svg element using d3.select
+    // step 3. Volcano database
+    // step 4. convert data into isoline coordinates using (d3.contour)
+    // step 5. create a path generator function (d3.geoPath)
+    // step 6. append the generated isolines to svg
+    *************************************************************************************/
+    let data_file = "https://gist.githubusercontent.com/mbostock/4241134/raw/da906a9b9c5fb2b4a2aa9691c839781977b32613/volcano.json\n"
+    //step 2:
+    let svg = d3.select('svg');
+    //------------------------------------
+    //step 3
+    d3.json(data_file).then(main);
+    function main(data){
+    const m = data.width;
+    const n = data.height;
+    const matrix = data.values;
+    //------------------------------------
+    // step 4
+    const extent = d3.extent(matrix,function (d) { return d;
+    });
+    let contour = d3.contours().size([m,n]).thresholds(d3.range(extent[0],extent[1],8))(matrix);
+
+    //------------------------------------
+    //step 5
+    const path = d3.geoPath();
+    //------------------------------------
+    //------COLOR CODE BY ELEVATION------
+    let min_max = d3.extent(contour,
+        function (d) {return d.value});
+
+    let colorScale = d3.scaleSequential().domain(min_max)
+            .interpolator(d3.interpolateViridis);
+    // ------------------------------------
+
+    // step 6
+    svg.selectAll('path')
+        .data(contour).enter().append('path')
+        .attr('d',path)
+        .attr('stroke','black').attr('fill',"none")
+        .attr("stroke-linejoin", "round")
+        .attr('stroke-width','0px')
+        .attr('fill',function (d) {return colorScale(d.value)
+        })
+    }
+
+</script>
+</body>
+</html>

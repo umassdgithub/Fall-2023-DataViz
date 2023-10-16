@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Marching Squares Example</title>
+    <script src="../../js/d3.js"></script>
+    <style>
+        svg{
+            width: 800px;height: 600px;
+        }
+        circle{
+            fill-opacity: .6;
+        }
+    </style>
+</head>
+<body>
+<svg viewBox="0 0 100 100"></svg>
+
+<script>
+    // Step 1
+    // Create a Two-dimensional Gaussian function
+    // Use the function from wiki: https://en.wikipedia.org/wiki/Gaussian_function
+    const Gaussian_2d = (x,y,A=1, x0 = 0, y0 = 0, Sigma_x = 1, Sigma_y = 1)=>{
+        return A * Math.exp(-1* (
+                      Math.pow((x-x0),2)/(2*Sigma_x*Sigma_x)
+                    + Math.pow((y-y0),2)/(2*Sigma_y*Sigma_y)))}
+    const x_list=d3.range(-3,3,.3);
+    const y_list=d3.range(-3,3,.3);
+    // populate a matrix for the Gaussian function
+    const matrix = []
+    const actMatrix =[]
+
+    x_list.forEach((x,i)=>{
+        matrix.push([])
+        actMatrix.push([])
+        y_list.forEach((y,j)=>{
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator
+            const rnd = Gaussian_2d(x,y);
+            const value = (rnd>=.5 || rnd<=.2) ? 1 : 0; // make a ring
+            matrix[i].push([])
+            actMatrix[i].push([])
+            matrix[i][j] = value
+            actMatrix[i][j] = rnd
+        })
+    })
+
+    /// The function to chose type of square
+    /// https://en.wikipedia.org/wiki/Marching_squares
+    function detect_Type(Matrix, i, j) {
+        let edges = [
+            [(Matrix[i][j] + Matrix[i + 1][j]) / 2,
+                (i + i + 1) / 2,
+                (j + j) / 2],
+            [(Matrix[i + 1][j] + Matrix[i + 1][j + 1]) / 2,
+                (i + 1 + i + 1) / 2,
+                (j + j + 1) / 2],
+            [(Matrix[i + 1][j + 1] + Matrix[i][j + 1]) / 2,
+                (i + i + 1) / 2,
+                (j + 1 + j + 1) / 2],
+            [(Matrix[i][j + 1] + Matrix[i][j]) / 2,
+                (i + i) / 2,
+                (j + j + 1) / 2]
+        ]
+        let connections = []
+
+        for (let k = 0; k < 4; k++) {
+            if (edges[k][0] === .5) {
+                //connections.push({x: edges[k][1], y: edges[k][2]})
+                connections.push([edges[k][1], edges[k][2]])
+            }
+        }
+        return connections;
+    }
+    // append the values to svg
+    // xScale and yScale
+    const svg = d3.select("svg")
+    const margin = 5
+    const xScale = d3.scaleLinear().domain([0,matrix.length]).range([margin,100-margin])
+    const yScale = d3.scaleLinear().domain([0,matrix[0].length]).range([100-margin,margin])
+    const pattern = svg.append("g").attr("class","pattern")
+    for(let i=0;i<matrix.length;i++){
+        for(let j=0;j<matrix.length;j++){
+            pattern.append("circle")
+                .attr("cx",xScale(i))
+                .attr("cy",yScale(j))
+                .attr("r",2)
+                //.attr("fill",matrix[i][j]===0?"blue":"red")
+                .attr("fill",d3.interpolateRdBu(actMatrix[i][j]))
+        }
+    }
+     //create the lines
+    const fullLine =[]
+    let localLine = []
+    let  line =[]
+
+
+    for (let i = 0; i < matrix.length-1; i++) {
+           localLine = []
+           for (let j = 0; j < matrix[0].length - 1; j++) {
+               if (detect_Type(matrix, i, j).length > 0) {
+                   line = detect_Type(matrix, i, j)
+                   if(line.length>0){
+                       localLine.push(line)
+                   }
+               }
+           }
+           if(localLine.length>0){
+               fullLine.push(...localLine)
+           }
+       }
+
+
+  const lineGenerator = d3.line().x(d=>xScale(d[0])).y(d=>yScale(d[1]))
+    const contours = svg.append("g").attr("class","marchingCubeLines")
+  contours
+        .selectAll("path")
+        .data(fullLine)
+        .enter()
+        .append("path")
+        .attr("d",lineGenerator)
+        .attr("fill","black")
+        .attr("stroke","black")
+
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Geospatial Contour Example 02</title>
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
+    <style>
+        #time
+        {
+            position: absolute;
+            top:15px;
+            left: 15px;
+            font-family: sans-serif;
+            font-size: 12pt;
+        }
+        .legend_text{
+            font-family: sans-serif;
+            font-size: 5pt;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+<svg width="80vw" viewbox="0 0 192 121"></svg>
+
+<div id='time'>
+</div>
+
+
+<script>
+
+    const timeSeries = `time_series/temperature_${0}.csv`; //  abstracted data file
+    let svg = d3.select("svg");
+    // min max temperature read during 2018
+    const min_temp =-88;
+    const max_temp = 56;
+    // path generator
+    const path = d3.geoPath();
+
+    function plot_contour(fileName)
+    {
+        // Step 1 read csv file
+        d3.csv(fileName).then(function (data)
+        {
+            // data dimensions
+            let m= 192, n= 121;
+
+            // Step 2 convert data into 1D list
+            let values_T= [];
+            data.forEach(function (d) {
+                values_T.push(+d[0])
+            });
+
+
+            /////////////////COLOR CODING/////////////////////////////
+            let colors = d3.scaleLinear()
+                .domain(d3.range(min_temp,max_temp,
+                    parseInt(Math.abs(max_temp-min_temp)/6.5)))
+                .range(["#0d1a50", "#3e5eba", "#2b83ba",
+                    "#abdda4", "#ffffbf", "#fdae61", "#d7191c"])
+                .interpolate(d3.interpolateHcl);
+
+            ////////////////////////////////////////////////////////////
+
+
+
+            // Step 3 contour generator
+            let contours = d3.contours()
+            .size([m, n])
+                .thresholds(d3.range(min_temp,max_temp,6)) // threshold is 6 degrees
+                (values_T);
+
+            // Step 3 append contour to path (d)
+            svg.append("g").attr("class","contours")
+                .selectAll("path")
+                .data(contours)
+                .enter()
+                .append("path")
+                .attr("d",function(d){return path(d)})
+                .attr("stroke","black")
+                .attr("stroke-width",".1px")
+                .attr("stroke-linejoin", "round")
+                .attr("fill",
+                    function (d) {
+                        return colors(d.value)
+                    })
+        })
+    }
+
+
+    plot_contour(timeSeries)
+
+</script>
+</body>
+</html>

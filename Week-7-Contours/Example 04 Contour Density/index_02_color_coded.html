@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Density Contour</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        g.axis{
+            font-size: 20pt;
+            stroke-width: 1px;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+<svg viewBox="0 0 1000 1000" width="50vw">
+</svg>
+<script>
+    // step 1 set data file
+    let data_file ="palmer_penguin_species.tsv";
+    //step 2: prepare environment for the visualization
+    let svg = d3.select('svg');
+    let bandwidth = 50; // bandwidth of the contours
+    const height = 1000;
+    const width =1000;
+    const margin = 100;
+    //------------------------------------
+    //step 3: Load data using asynchronous function
+    d3.tsv(data_file).then(main); // run main when data is loaded
+
+    function main(data){
+        // x : culmen_length_mm & y: culmen_depth_mm
+
+        // calculate extents for the data using extent function (min max)
+        let x_extent = d3.extent(data,function (d) {
+            return d['culmen_length_mm']
+        });
+        let y_extent = d3.extent(data,function (d) {
+            return d['culmen_depth_mm']
+        });
+        // scale function to scale data with the svg ranges
+        let xScale = d3.scaleLinear()
+            .domain([x_extent[0]*.9,x_extent[1]])
+            .range([ margin, width-margin ]);
+        // Add Y axis
+        let yScale = d3.scaleLinear()
+            .domain([y_extent[0]*.9,y_extent[1]])
+            .range([ height-margin, margin]);
+
+        // compute the density data
+        let contourDensity = d3.contourDensity()
+            .x(function(d) { return xScale(d.culmen_length_mm); })
+            .y(function(d) { return yScale(d.culmen_depth_mm); })
+            .size([900, 900])
+            .bandwidth(bandwidth)
+            (data);
+
+        let colorScale = d3.scaleSequential()
+            .domain(d3.extent(contourDensity,d=>d.value))
+            .interpolator(d3.interpolateViridis);
+
+
+        console.log(contourDensity)
+
+
+        let figure = svg.append("g")
+        figure.selectAll("path")
+            .data(contourDensity)
+            .enter()
+            .append("path")                     // one path for each contour polyline
+            .attr("d", d3.geoPath())            // geoPath generator to generate contour lines
+            .attr("stroke", "black")            // color of the strokes
+            .attr("stroke-width", "1px")        // thickness of the lines
+            .attr("stroke-linejoin", "round")   // rounded edges for the contours
+
+            .attr('fill',d=> colorScale(d.value));
+
+        // append the x and y axis for the contour plot
+        figure.append("g")
+            .attr("class", "axis")
+            .attr("transform", `translate(${margin},0)`)
+            .call(d3.axisLeft(yScale));
+        figure.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(0," + (height-margin) + ")")
+            .call(d3.axisBottom(xScale));
+
+            }
+
+</script>
+</body>
+</html>

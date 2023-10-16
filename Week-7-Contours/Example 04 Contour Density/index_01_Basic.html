@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Density Contour</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <style>
+        g.axis{
+            font-size: 12pt;
+            stroke-width: 1px;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+<svg viewBox="0 0 1000 1000" width="50vw">
+</svg>
+<script>
+    /************************************************************************************
+     // step 1. add svg element to html file -- set viewBox and width and height
+     // step 2. select svg element using d3.select
+     // step 3. Volcano database
+     // step 4. convert data into isoline coordinates using (d3.contour)
+     // step 5. create a path generator function (d3.geoPath)
+     // step 6. append the generated isolines to svg
+     *************************************************************************************/
+    let data_file ="palmer_penguin_species.tsv";
+    //step 2:
+    let svg = d3.select('svg');
+
+
+    let bandwidth = 50; // bandwidth of the contours
+    const height = 1000;
+    const width =1000;
+    const margin = 100;
+    //------------------------------------
+    //step 3
+    d3.tsv(data_file).then(main);
+
+
+    function main(data){
+        // x : culmen_length_mm vs y: culmen_depth_mm
+        let x_extent = d3.extent(data,d=>d['culmen_length_mm']);
+        let y_extent = d3.extent(data,d=>d['culmen_depth_mm']);
+
+
+        let xScale = d3.scaleLinear()
+            .domain(x_extent)
+            .range([ margin, width-margin ]);
+        // Add Y axis
+        let yScale = d3.scaleLinear()
+            .domain(y_extent)
+            .range([ height-margin, margin ]);
+
+
+        // compute the density data
+        let contourDensity = d3.contourDensity()
+            .x(d=>xScale(d.culmen_length_mm))
+            .y(d=>yScale(d.culmen_depth_mm))
+            .size([900, 900])
+            .bandwidth(bandwidth)
+            (data);
+
+
+        let figure = svg.append("g")
+
+        figure.selectAll("path")
+            .data(contourDensity)
+            .enter().append("path")
+            .attr("d", d3.geoPath())
+            .attr("stroke", "black")
+            .attr("stroke-width", "1px")
+            .attr("stroke-linejoin", "round")
+            .attr('fill','none')
+
+        figure.append("g")
+            .attr("class", "axis")
+            .attr("transform", `translate(${margin},0)`)
+            .call(d3.axisLeft(yScale));
+        figure.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(0," + (height-margin) + ")")
+            .call(d3.axisBottom(xScale));
+            }
+
+</script>
+</body>
+</html>

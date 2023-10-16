@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic contour lines</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+<svg viewBox="0 0 200 200">
+</svg>
+<script>
+    /************************************************************************************
+    // step 1. add svg element to html file -- set viewBox and width and height
+    // step 2. select svg element using d3.select
+    // step 3. Volcano database
+    // step 4. convert data into isoline coordinates using (d3.contour)
+    // step 5. create a path generator function (d3.geoPath)
+    // step 6. append the generated isolines to svg
+    *************************************************************************************/
+    let data_file = "./data/volcano.json"
+    //step 2:
+    let svg = d3.select('svg');
+    //------------------------------------
+    //step 3
+    d3.json(data_file).then(main)
+
+    function main(data){
+
+    const m = data.width;
+    const n = data.height;
+    const matrix = data.values;
+    //------------------------------------
+    // step 4
+    const extent = d3.extent(matrix,d=>d);
+    let contour = d3.contours()
+        .size([m,n])
+        .thresholds(d3.range(extent[0],extent[1],8))(matrix);
+    //------------------------------------
+    //step 5
+    const path = d3.geoPath()
+    //------------------------------------
+    // step 6
+    svg.selectAll('path')
+        .data(contour).enter().append('path')
+        .attr('d',path)
+        .attr('stroke','black').attr('fill',"none")
+        .attr("stroke-linejoin", "round")
+        .attr('stroke-width','.1px');}
+</script>
+</body>
+</html>
