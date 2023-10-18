@@ -34,7 +34,7 @@
     // step 4
     const extent = d3.extent(matrix,function (d) { return d;
     });
-    let contour = d3.contours().size([m,n]).thresholds(d3.range(extent[0],extent[1],8))(matrix);
+    let contour = d3.contours().size([m,n]).thresholds(d3.range(extent[0],extent[1],1))(matrix);
 
     //------------------------------------
     //step 5

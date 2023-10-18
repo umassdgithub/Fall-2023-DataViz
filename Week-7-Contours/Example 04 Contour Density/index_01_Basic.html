@@ -55,7 +55,7 @@
             .domain(y_extent)
             .range([ height-margin, margin ]);
 
-
+        console.log(bandwidth)
         // compute the density data
         let contourDensity = d3.contourDensity()
             .x(d=>xScale(d.culmen_length_mm))
@@ -64,7 +64,7 @@
             .bandwidth(bandwidth)
             (data);
 
-
+        console.log(contourDensity)
         let figure = svg.append("g")
 
         figure.selectAll("path")

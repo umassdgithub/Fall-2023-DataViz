@@ -53,16 +53,16 @@
         }
 
 
-        let svg = d3.select(figure).append("svg")
+        const svg = d3.select(figure).append("svg")
             .attr('width', '100%')
             .attr('height', '100%');
-        let plot = svg.append('g')
+        const plot = svg.append('g')
             .attr('id', 'plot')
 
-        let xScale = d3.scaleLinear()
+        const xScale = d3.scaleLinear()
             .domain([0, xDim])
             .range([padding, w - padding])
-        let yScale = d3.scaleLinear()
+        const yScale = d3.scaleLinear()
             .domain([yDim, 0])
             .range([padding, h - padding])
 
@@ -75,9 +75,12 @@
                 return 0;
             }
         }
-        function color(d) {if (d === 0){return dem_color} else{return gop_color}}
+        //function color(d) {if (d === 0){return dem_color} else{return gop_color}}
+        const color = (d) => (d === 0 ? dem_color : gop_color); // shorter format
 
-        let canvas = [] // is the matrix of 0 and 1 that we will use for contour generation
+        const canvas = [] // is the matrix of 0 and 1 that we will use for contour generation
+
+        // this is the grid of the data
         for (let i = 0; i < xDim; i++) {
             canvas.push([])
             for (let j = 0; j < yDim; j++) {
@@ -92,6 +95,8 @@
                 }
             }
         }
+
+
         // create random bits
         for (let i = 0; i < xDim; i++) {
             for (let j = 0; j < yDim; j++) {

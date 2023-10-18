@@ -30,7 +30,7 @@
     d3.json(data_file).then(main)
 
     function main(data){
-
+    console.log(data)
     const m = data.width;
     const n = data.height;
     const matrix = data.values;
@@ -39,7 +39,8 @@
     const extent = d3.extent(matrix,d=>d);
     let contour = d3.contours()
         .size([m,n])
-        .thresholds(d3.range(extent[0],extent[1],8))(matrix);
+        .thresholds(d3.range(extent[0],extent[1],25))(matrix);
+    console.log(contour)
     //------------------------------------
     //step 5
     const path = d3.geoPath()

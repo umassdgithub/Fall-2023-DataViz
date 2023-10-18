@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animating contour</title>
+
+    <style>
+        #time {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-family: sans-serif;
+            font-size: 12pt;
+        }
+
+        .legend_text {
+            font-family: sans-serif;
+            font-size: 5pt;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+</head>
+
+<body>
+<canvas id="canvas" width="960" height="600"></canvas>
+<div id='time'></div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const min_temp = -80;
+    const max_temp = 70;
+
+    function plot_contour(fileName) {
+        d3.csv(fileName).then(function (data) {
+            // dimensions are known
+            const m = 192, n = 121;
+            let values_T = [];
+            data.forEach(function (d) {
+                values_T.push(+d[0]);
+            });
+            const extents = d3.extent(values_T);
+            let contours = d3.contours()
+                .size([m, n])
+                .thresholds(d3.range(min_temp, max_temp, 2))
+                (values_T);
+
+            let colors = d3.scaleLinear()
+                .domain(d3.range(min_temp, max_temp, parseInt(Math.abs(max_temp - min_temp) / 6.5)))
+                .range([
+                    "#0d1a50",
+                    "#3e5eba",
+                    "#2b83ba",
+                    "#abdda4",
+                    "#ffffbf",
+                    "#fdae61",
+                    "#d7191c"
+                ])
+                .interpolate(d3.interpolateHcl);
+
+            function add_legend(ax, colorScale) {
+                let legend_data = d3.map(colorScale.domain(), function (d, i) {
+                    if (i === 0) {
+                        return {
+                            text: d3.format(".2s")(d) + " and below",
+                            c: colors.range()[i]
+                        }
+                    } else if (i === 6) {
+                        return {
+                            text: d3.format(".2s")(d) + " and above",
+                            c: colors.range()[i]
+                        }
+                    } else {
+                        return {
+                            text: d3.format(".2s")(d) + " - " + d3.format(".2s")(colorScale.domain()[i + 1] - 1),
+                            c: colors.range()[i]
+                        }
+                    }
+                });
+
+                ax.clearRect(0, 0, 200, legend_data.length * 10 + 20);
+
+                legend_data.forEach(function (d, i) {
+                    ax.fillStyle = d.c;
+                    ax.fillRect(10, i * 10, 10, 10);
+                    ax.font = "5pt sans-serif";
+                    ax.fillStyle = "black";
+                    ax.fillText(d.text, 30, i * 10 + 10);
+                });
+            }
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            contours.forEach(function (contour) {
+                context.beginPath();
+                context.strokeStyle = colors(contour.value);
+                context.lineWidth = 1;
+                contour.coordinates.forEach(function (coords) {
+                    coords.forEach(function (coord, i) {
+                        if (i === 0) {
+                            context.moveTo(coord[0], coord[1]);
+                        } else {
+                            context.lineTo(coord[0], coord[1]);
+                        }
+                    });
+                });
+                context.stroke();
+                context.fillStyle = colors(contour.value);
+                context.fill();
+            });
+
+            add_legend(context, colors);
+        });
+    }
+
+    let frameNumber = 0;
+
+    function frame() {
+       // d3.select("#time").text(dates_2018[frameNumber]);
+        if (frameNumber >= timeSeries.length - 1) {
+            frameNumber = 0;
+        } else {
+            frameNumber++;
+        }
+        plot_contour(timeSeries[frameNumber]);
+    }
+
+    d3.interval(frame, 300);
+</script>
+</body>
+</html>
