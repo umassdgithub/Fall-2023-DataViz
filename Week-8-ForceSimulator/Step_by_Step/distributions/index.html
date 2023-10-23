@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Distributions</title>
+  <script src="../../lib/d3.js"></script>
+</head>
+<body>
+<div>
+<button id="generator">Generate Strongly Connected Random Network</button>
+</div>
+<br>
+<div>
+<textarea id="textAreaNodes" cols="40" rows="30"></textarea>
+<textarea id="textAreaLinks" cols="40" rows="30"></textarea>
+</div>
+<script>
+
+ function makeRandomNetwork() {
+   // types of random number generator
+   const rand_links = d3.randomUniform()
+   const rands_group = d3.randomBinomial(20, .5)
+
+   //nodes (uniform random network)
+   const nodes = d3.map(
+           d3.range(100), (d) => ({
+             name: d,                // just the number
+             group: rands_group()    // Binomial random number between o and 20
+           }))
+
+
+   // connections (uniform random network)
+   links = []
+
+
+   for (let i = 0; i < nodes.length; i++) {
+     for (let j = 0; j < parseInt(rand_links() * 5); j++) {
+       links.push({
+                 source: i,
+                 target: parseInt(rand_links() * 100), //  source and target
+                 value: 1 + parseInt(rand_links() * 10)
+               }
+       )
+     }
+   }//  source and target}
+   d3.select("#textAreaNodes").text(JSON.stringify(nodes, null, 2))
+   d3.select("#textAreaLinks").text(JSON.stringify(links, null, 2))
+ }
+ d3.select("#generator").on("click",makeRandomNetwork)
+ makeRandomNetwork()
+</script>
+
+</body>
+</html>

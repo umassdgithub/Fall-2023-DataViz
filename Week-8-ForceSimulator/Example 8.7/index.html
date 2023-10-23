@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Make Force Layout</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <script src="network.js"></script>
+
+</head>
+<body>
+<script>
+    d3.json("../data/miserables.json").then(function (data){
+        let svg = d3.select('body').append("svg").attr("viewBox","0 0 1000 800")
+
+        simulate(data,svg) // main function to make network
+    })
+
+
+
+</script>
+
+</body>
+</html>

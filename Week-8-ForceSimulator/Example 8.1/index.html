@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Force Layout Nodes</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+</head>
+<body>
+<svg width="100vw" height="100vh" viewBox="0 0 1000 800">
+</svg>
+<script>
+    let nodes = [].concat(
+        d3.range(20).map(()=> { return ({type: "a",color:'steelblue'}); }),
+        d3.range(20).map(() => { return {type: "b",color:'red'}; })
+    );
+    let svg = d3.select('svg')
+    let width = parseInt(svg.attr("viewBox").split(' ')[2])
+    let height = parseInt(svg.attr("viewBox").split(' ')[3])
+
+    let node_elements = svg.append("g")
+        .attr('transform',`translate(${width/2},${height/2})`)
+        .selectAll(".circle")
+        .data(nodes)
+        .enter()
+        .append("circle")
+        .attr("r", 20)
+        .attr("fill", d=> d.color)
+
+    d3.forceSimulation(nodes)
+        .force("collide",
+            d3.forceCollide()
+                .radius(40)
+               // .iterations(5000)
+        )
+        .force("x", d3.forceX())
+        .force("y", d3.forceY())
+        .on("tick", ticked);
+
+    function ticked() {
+        node_elements
+            .attr("cx", d=>d.x)
+            .attr("cy", d=>d.y)
+    }
+</script>
+</body>
+</html>

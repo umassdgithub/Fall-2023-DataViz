@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Force Layout Nodes Links and Nodes!</title>
+    <script src="../lib/d3.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+    <link rel="stylesheet" href="../styles/style.css">
+
+
+</head>
+<body>
+<div class="row">
+    <div class="col">
+        <h1>D3JS Force Simulation</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <h4>Alpha:<span id="alpha"></span></h4>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p class="headInfo">
+            This simulation is controlled by a parameter <a href="https://d3js.org/d3-force/simulation#simulation_alpha">alpha</a> which represents
+            the current <b>cooling factor</b> of the simulation.
+            The alpha value starts at a high value (e.g., 1) and gradually
+            decreases over time as the simulation progresses.
+        </p>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <svg width="80vw" height="80vh" viewBox="0 0 1200 1000"></svg>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <label for="collide">Collide Force:</label>
+        <input type="range" id="collide" min="0" max="100" step="1" value="25">
+    </div>
+    <div class="col">
+        <label for="charge">Charge Force:</label>
+        <input type="range" id="charge" min="-1000" max="1000" step="10" value="0">
+    </div>
+    <div class="col">
+        <label for="linkStrength">Link Strength:</label>
+        <input type="range" id="linkStrength" min="0" max="1" step="0.1" value="1">
+    </div>
+</div>
+<script>
+    let svg = d3.select('svg');
+    let width = parseInt(svg.attr("viewBox").split(' ')[2]);
+    let height = parseInt(svg.attr("viewBox").split(' ')[3]);
+
+
+    // make group color scale
+    // for the color scales refer to https://d3js.org/d3-scale-chromatic/categorical
+    let color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    // making nodes from a random number generator
+    // in this example I have used Binomial and Uniform random numbers (totally arbitrary):
+    //https://www.simplilearn.com/tutorials/statistics-tutorial/binomial-distribution#what_is_binomial_distribution
+
+    // Binomial
+    let rands_group = d3.randomBinomial(20,.5)
+
+    // Uniform
+    let rand_links = d3.randomUniform()
+
+
+    // The network data is based on Nodes and Links between them,
+    // I have used the random number generator (PRNG) for the groups that I  made above to form the nodes dataset
+    const nodes = d3.map(d3.range(100),(d,i) => ({name: i,group: rands_group()}))
+
+
+    const links = []
+    for(let i=0;i<nodes.length;i++)
+    {
+        for(let j=0;j<parseInt(rand_links()*3);j++)
+        {
+            links.push({source:i,
+                target:parseInt(rand_links()*100),
+                value:1+parseInt(rand_links()*10)})
+        }
+    }
+
+    // Before I start adding the forces to the nodes, using the forceSimulator
+    // I have added the Marks for Nodes and Links
+
+    // Adding Node Marks
+    let node_elements = svg.append("g")
+        .attr('transform',`translate(${width/2},${height/2})`)
+        .selectAll(".circle")
+        .data(nodes)    //list of nodes
+        .enter()
+        .append("circle")   // append a circle as a node/mark
+        .attr("r", 10)      // radius is a channel, which is not applied here
+        .attr("fill", d=> color(d.group))   // Categorical channel Color Hue
+
+
+
+    // Adding Link Marks
+    let link_elements = svg.append("g") // a new group is added first to have a layer specific for the link marks.
+        .attr('transform',`translate(${width/2},${height/2})`) // translate all the link marks to the center.
+        .attr("stroke", "#999")                                 // stroke color
+        .attr("stroke-opacity", 0.6)
+        .selectAll(".line")
+        .data(links)        // Bind the data
+        .enter()
+        .append("line")     // Append a line (svg element)
+        .style("stroke-width", d=>d.value);
+
+
+
+
+
+
+
+    // Create references to the input range elements
+    let collideInput = document.getElementById("collide");
+    let chargeInput = document.getElementById("charge");
+    let linkStrengthInput = document.getElementById("linkStrength");
+    let AlphaValue = document.getElementById("alpha")
+
+    // Add event listeners to update the forces when the inputs change
+    collideInput.addEventListener("input", updateCollideForce);
+    chargeInput.addEventListener("input", updateChargeForce);
+    linkStrengthInput.addEventListener("input", updateLinkStrength);
+
+    // Initialize the forces with default values
+    let collideForce = d3.forceCollide().radius(25);
+    let chargeForce = d3.forceManyBody();
+    let linkForce = d3.forceLink(links).distance(1).strength(1);
+
+    // Create the force simulation
+    let ForceSimulation = d3.forceSimulation(nodes)
+        .force("collide", collideForce)
+        .force("x", d3.forceX())
+        .force("y", d3.forceY())
+        .force("charge", chargeForce)
+        .force("link", linkForce)
+        .on("tick", ticked);
+
+    // Function to update collide force
+    function updateCollideForce() {
+        let radius = parseInt(collideInput.value);
+        collideForce.radius(radius);
+        ForceSimulation.alpha(.5).restart();
+    }
+
+    // Function to update the charge force
+    function updateChargeForce() {
+        let strength = parseInt(chargeInput.value);
+        chargeForce.strength(strength);
+        ForceSimulation.alpha(.5).restart();
+    }
+
+    // Function to update the link strength
+    function updateLinkStrength() {
+        let strength = parseFloat(linkStrengthInput.value);
+        linkForce.strength(strength);
+        ForceSimulation.alpha(.5).restart();
+    }
+
+    function ticked() {
+        node_elements
+            .attr("cx", d=>d.x)
+            .attr("cy", d=>d.y)
+
+        link_elements
+            .attr("x1",d=>d.source.x)
+            .attr("x2",d=>d.target.x)
+            .attr("y1",d=>d.source.y)
+            .attr("y2",d=>d.target.y)
+        AlphaValue.innerText=ForceSimulation.alpha().toFixed(3)
+    }
+</script>
+</body>
+</html>

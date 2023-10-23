@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Make Force Layout</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="network.js"></script>
+    <style>
+        circle{
+            fill-opacity: .9;
+        }
+        line{
+            stroke:#909090;
+            stroke-opacity:0.6;
+        }
+        svg{
+            height: 80vh;
+            width: 80vw;
+        }
+    </style>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+<div class="row">
+    <div class="col">
+        <h1>D3JS Force Simulation</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <h4>La Miserable Novel<span id="alpha"></span></h4>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p class="headInfo">
+           Network below depicts La Miserable (a French historical novel by Victor Hugo) characters and their connection.
+        </p>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <svg viewBox="0 0 1000 800"></svg>
+    </div>
+</div>
+
+<script>
+    d3.json("../data/miserables.json").then( (data)=>{
+        let svg = d3.select('svg')
+        simulate(data,svg)
+    })
+
+
+
+</script>
+
+</body>
+</html>
