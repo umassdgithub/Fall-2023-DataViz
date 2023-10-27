@@ -16,7 +16,7 @@
     - Bottom: Color the map by County(30/100 points)
         - Add interaction (mouse enter/mouse leave) and highlight each county on hover (20/100 points).
 
-3. **Add Tooltip DIV Element:** Add an HTML DIV element to show data for each county when the mouse enters the county on each map (20/100 points).
+3. **Add Tooltip DIV Element:** Add an HTML DIV element to show data for each county when the mouse enters the **county/town** on each map (20/100 points).
 
 4. **Page Styling:** Add a title (H1) for the assignment at the top center of the page and your name below it (H3). Style the page and center the SVG using a div (10/100 points).
 
