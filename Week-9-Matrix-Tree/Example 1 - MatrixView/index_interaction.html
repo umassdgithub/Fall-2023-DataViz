@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix - U.S. between State Migration</title>
+    <script src="../js/d3.js"></script>
+    <style>
+        .label{
+
+            fill: grey;
+            font-size: 10pt;
+            /* font-weight: bold; */
+        }
+        .active{
+            fill: #5d1818;
+            font-size: 12pt;
+            font-weight: bold;
+        }
+        .semiActive{
+            fill:orange;
+            font-size: 11pt;
+            font-weight: bold;
+        }
+        .container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        text{
+            font-family: sans-serif;
+        }
+        .title{
+         display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Brush Script MT";
+            font-size: 22pt;
+        }
+        .data_source{
+            display: flex;
+            justify-content: right;
+            margin-right: 25vw;
+            font-family: sans-serif;
+            font-size: 8pt;
+        }
+    </style>
+</head>
+<body>
+<div class="title">
+    Migrations from State to State
+</div>
+<div class="container">
+</div>
+<div class="data_source">Source:&nbsp;<a href="https://www.census.gov/data/tables/time-series/demo/geographic-mobility/state-to-state-migration.html">State-to-State Migration Flows</a></div>
+<script>
+    ////////////////////////////////////////////////////////////////
+    /*          Constants and Visualization Containers           */
+    ////////////////////////////////////////////////////////////////
+    const width =1000,height =1100;
+    const margins = {
+        top:20,
+        left:20,
+        right:20,
+        bottom:20
+    }
+
+    const svg= d3.selectAll('.container')
+        .append("svg")
+        .attr("width","80vw")
+        .attr("height","80vh")
+        .attr("viewBox",`0 0 ${width} ${height}`);
+    const mainGroup = svg.append("g").attr('class',"mainGroup")
+
+    ////////////////////////////////////////////////////////////////
+    /*          Data loading and Processing                       */
+    ////////////////////////////////////////////////////////////////
+    d3.csv("./data/State_to_State_Migrations_Table_2019.csv").then(data=>{
+        ///  group the data elements by the destination of the migrants
+        const state_groups = d3.group(data,d=>d.Destination); // group will return keys of destination,and values of sources
+
+        ////////////////////////////////////////////////////////////////
+        /*          The color coding function                       */
+        ////////////////////////////////////////////////////////////////
+        // find min-max of the migrations
+        const min_max = d3.extent(data.map(d=>      // d3.extent here get the min max of all min-max values
+                                            d3.extent( // d3.extent get the min max of each group
+                                                Object.keys(d).slice(1)// the first columns is the name of destinations, so drop it
+                                                    .map(
+                                                        v=>isNaN(+d[v])?0:+d[v] // there are nan values which indicate no migration, so replace it with zero
+                                                    )
+                                            )
+                                    ).flat() // the list of min maxes for each row is converted to on flat array
+                                )
+        const Normalizer=d3.scaleLinear()
+            .domain(min_max)
+
+        /// Spacing and size of the rectangle
+        const spacing =3;
+        const rectDim = (width-(margins.left+margins.right)-spacing*data.length)/data.length
+
+
+        ////////////////////////////////////////////////////////////////
+        /*            Add X and Y Labels                             */
+        ////////////////////////////////////////////////////////////////
+        const States = data.columns.slice(1)
+        const xLabels =
+            mainGroup.selectAll('.text')
+            .data(States)
+            .join('g').attr("class","label")
+            .attr("transform",(d,i)=>`translate(${i*(rectDim+spacing)+130},${100})rotate(-60)`)
+            .append('text')
+            .text(d=>d).attr('class',(_,i)=>`col_${i}`)
+
+
+        const yLabels = mainGroup.selectAll('.text')
+            .data(States)
+            .join('g')
+            .attr("class","label")
+            .attr("transform",(d,i)=>`translate(${0},${i*(rectDim+spacing)+130})`)
+            .append('text').attr('class',(_,i)=>`row_${i}`)
+            .text(d=>d)
+
+
+
+        ////////////////////////////////////////////////
+        /*          main update function              */
+        ////////////////////////////////////////////////
+
+        main(Array.from(state_groups),".mainGroup",marginTop=100,marginLeft=100)
+
+
+
+
+        // main function
+
+        function main(processed_data,ContainerName,marginTop=10,marginLeft=10){
+
+            const container = d3.select(ContainerName).append("g").attr("transform",`translate(${marginLeft},${marginTop})`)
+            const groups =container
+                .append("g")
+                .attr("transform",`translate(${20},${20})`)
+                .selectAll('.g')
+                .data(processed_data)
+                .join('g')
+                .attr("transform",(d,i)=>`translate(${0},${i*(rectDim+spacing)})`)
+                .attr("class","target").selectAll('sources')
+                .data(d=> {
+                        const destination =States.indexOf(d[0])
+                        return Object.values(d[1][0]).slice(1).map(d => ({
+                            value:isNaN(d) ? 0 : +d,
+                            destination:destination}))
+                    }
+                    )
+                .join("g")
+                .attr("transform",(d,i)=>`translate(${i*(rectDim+spacing)},${0})`)
+                .append("rect")
+                .on("mouseenter",mouseEnter)
+                .on("mouseleave",mouseLeave)
+                .attr("id",(d,i)=>`cc_${d.destination}_${i}`)
+                .attr("class",(d,i)=>`row_${d.destination} col_${i}`)
+                .attr("width",rectDim)
+                .attr("height",rectDim)
+                .attr('fill',(d,i)=>{
+                    return d3.interpolateGreens(Normalizer(d.value))
+                    }
+                )
+                .attr('opacity',.8)
+
+            ////////////////////////////////////////////////
+            /*              User interaction            */
+            ////////////////////////////////////////////////
+
+            function mouseEnter(d,m){
+                const currentObject = d3.select(`#${this.id}`)
+                const row = this.id.split("_")[1]
+                const col = this.id.split("_")[2]
+                d3.selectAll(`.col_${col}`).classed("semiActive",true);
+                d3.selectAll(`.row_${row}`).classed("semiActive",true);
+                // find objects on the same row
+                currentObject.classed("semiActive",false).classed("active",true)
+            }
+            function mouseLeave(m,d){
+                const currentObject = d3.select(`#${this.id}`)
+                const row = this.id.split("_")[1]
+                const col = this.id.split("_")[2]
+                d3.selectAll(`.col_${col}`).classed("semiActive",false);
+                d3.selectAll(`.row_${row}`).classed("semiActive",false);
+                currentObject.classed("active",false)
+            }
+        }
+
+        mainGroup
+            .append('g')
+            .attr("transform",`translate(${100},${100}) rotate(-60)`)
+            .append("text")
+            .text("Source")
+            .attr("font-size","16pt")
+            .attr("fill","black")
+            .attr("class","xLabelName")
+
+        mainGroup
+            .append('g')
+            .attr("transform",`translate(${0},${110})`)
+            .append("text")
+            .text("Target")
+            .attr("font-size","16pt")
+            .attr("fill","black")
+    })
+
+
+
+
+</script>
+
+</body>
+</html>

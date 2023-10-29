@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Sample Circle Pack
+    </title>
+    <style>
+        svg{
+            width: 80vw;
+            height: 80vh;
+        }
+        circle{
+            opacity: .3;
+            stroke-width: 1px;
+            stroke: #fffcfc;
+        }
+        #title{
+            display: flex;
+            justify-content: center;
+            font-family: sans-serif;
+        }
+        #container{
+            display: flex;
+            justify-content: center;
+            font-family: sans-serif;
+        }
+
+    </style>
+    <script src="../js/d3.js"></script>
+</head>
+<body>
+<div id="title"><h2>U.S. Population</h2></div>
+<div id="container">
+    <svg></svg>
+</div>
+<script type="text/javascript">
+    d3.csv("../data/us_county_level_population.csv",d3.autoType).then( (data)=>{
+    const dataGroup = d3.group(data.filter(d=>d.COUNTY!==0), d=>d.STNAME,d=>d.CTYNAME)
+    const hier_root = d3.hierarchy(dataGroup)
+        .sum(d=>d.POPESTIMATE2019).sort((a,b) => {
+            return d3.descending(a.value, b.value)});
+        // ******************************
+        // select the svg element
+        let svg = d3.select('svg').attr("viewBox","0 0 1000 1000")
+
+        // ******************************
+        // make d3.pack() object
+        let packLayout = d3.pack()
+            .size([1000, 1000]);
+        // ******************************
+        // make d3.pack() object
+        packLayout(hier_root);
+
+        // calculate min max and color scale
+        let color_scale=d3.scaleLinear()
+            .domain(d3.extent(d3.filter(data,(d)=>+d.COUNTY!==0), (d)=>+d.POPESTIMATE2019))
+            .range(['#1c4566','#fcae72'])
+            .interpolate(d3.interpolate)
+
+        const font_size_scale = d3.scaleLog()
+            .domain(d3.extent(d3.filter(data, (d)=>+d.COUNTY===0), (d)=> +d.POPESTIMATE2019))
+            .range([10,35])
+
+        // ******************************
+        // add groups to the svg
+        let nodes = svg.selectAll('g')
+            .data(hier_root.descendants()) // data_hierarchy.descendants() flattens data
+            .enter()
+            .append('g')
+            .attr("transform",d=>`translate(${d.x},${d.y})`)
+        nodes
+            .append("circle")
+            .attr('r', d=> d.r)
+            .attr('fill', d=> color_scale(d.value))
+
+        nodes
+            .append('text')
+            .style("font-size", d=>{
+                if(d.height===2)
+                {
+                    return parseInt(font_size_scale(d.value)).toString()+"pt"
+                }
+            })
+            .attr('dx',  -6)
+            .attr('dy',  (d)=> -(.2*d.r))
+            .text(function(d) {
+                if(d.height===2){
+                    return `${d.data[0]}`;
+                }
+            })
+
+
+    })
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>

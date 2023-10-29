@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Sample Circle Pack
+    </title>
+    <style>
+        svg{
+            width: 100vw;
+            height: 100vh;
+        }
+        circle{
+            opacity: .3;
+            stroke-width: 1px;
+            stroke: #726e6e;
+        }
+    </style>
+    <script src="../js/d3.js"></script>
+</head>
+<body style="height: 100%; margin: 0">
+<svg>
+</svg>
+<script type="text/javascript">
+    // sample data (See slides)
+    let data=[
+        {"parentColumn": "",  "childColumn":"A"},
+        {"parentColumn": "A", "childColumn":"B"},
+        {"parentColumn": "A", "childColumn":"C"},
+        {"parentColumn": "B", "childColumn":"D","val":30},
+        {"parentColumn": "B", "childColumn":"E","val":50},
+        {"parentColumn": "C", "childColumn":"F","val":20},
+        {"parentColumn": "C", "childColumn":"G","val":40},
+        {"parentColumn": "C", "childColumn":"H","val":60}
+    ]
+    // ******************************
+    // Step 1 select the svg element
+    let svg = d3.select('svg')
+    // Step 2.1 stratify function converts data to parent child format
+    let  stratify_function= d3.stratify()
+        .id(d => d["childColumn"])
+        .parentId(d => d["parentColumn"])
+    //*****************************
+    // Step 2.2 apply stratify function on data
+    let data_formatted = stratify_function(data)
+    //*****************************
+    // Step 2.3 make hierarchy from data
+    let data_hierarchy = d3.hierarchy(data_formatted)
+    // Step 2.4 make sums of valus to the hierarchy
+    data_hierarchy.sum(function(d) {
+        return d.data.val;
+    })
+    // ******************************
+    // step 3.1  make d3.pack() object
+    let packLayout = d3.pack()
+        .size([500, 500]);
+    // ******************************
+    // step 3.2  make d3.pack() object
+    packLayout(data_hierarchy);
+
+    // step 3.3 calculate min max and color scale
+    let color_scale=d3.scaleLinear()
+        .domain(d3.extent(data_hierarchy,function (d){return d.value}))
+        .range(['#080840','#2fb32f'])
+
+
+    // ******************************
+    // step 4.1  add groups to the svg
+    let nodes = svg.selectAll('g')
+        .data(data_hierarchy.descendants()) // data_hierarchy.descendants() flattens data
+        .enter()
+        .append('g')
+        .attr("transform",function (d){return `translate(${d.x},${d.y})`})
+    nodes
+        .append("circle")
+        .attr('r', function(d) { return d.r; })
+        .attr('fill', function(d) {
+            console.log(color_scale(d.value))
+            return color_scale(d.value); })
+
+
+
+
+
+</script>
+
+</body>
+</html>

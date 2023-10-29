@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix - U.S. between State Migration</title>
+    <script src="../js/d3.js"></script>
+    <style>
+        text{
+            font-family: sans-serif;
+            fill: grey;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+<div class="container"></div>
+<script>
+    ////////////////////////////////////////////////////////////////
+    /*          Constants and Visualization Containers           */
+    ////////////////////////////////////////////////////////////////
+
+    const rectDim = 10
+    const spacing =3
+    const svg= d3.selectAll('.container')
+        .append("svg")
+        .attr("width","80vw")
+        .attr("height","90vh")
+        .attr("viewBox","0 0 1000 900");
+    const mainGroup = svg.append("g").attr('class',"mainGroup")
+
+    ////////////////////////////////////////////////////////////////
+    /*          Data loading and Processing                       */
+    ////////////////////////////////////////////////////////////////
+    d3.csv("./data/State_to_State_Migrations_Table_2019.csv").then(data=>{
+        ///  group the data elements by the destination of the migrants
+        const state_groups = d3.group(data,d=>d.Destination); // group will return keys of destination,and values of sources
+
+
+        ////////////////////////////////////////////////////////////////
+        /*          The color coding function                       */
+        ////////////////////////////////////////////////////////////////
+
+        // find min-max of the migrations
+        const min_max = d3.extent(data.map(d=>      // d3.extent here get the min max of all min-max values
+                d3.extent( // d3.extent get the min max of each group
+                    Object.keys(d).slice(1)// the first columns is the name of destinations, so drop it
+                        .map(
+                            v=>isNaN(+d[v])?0:+d[v] // there are nan values which indicate no migration, so replace it with zero
+                        )
+                )
+            ).flat() // the list of min maxes for each row is converted to on flat array
+        )
+        const Normalizer=d3.scaleLinear()
+            .domain(min_max)
+
+        ////////////////////////////////////////////////////////////////
+        /*            Add X and Y Labels                             */
+        ////////////////////////////////////////////////////////////////
+
+        const xLabels =
+            mainGroup.selectAll('.text')
+                .data(data.columns.slice(1))
+                .join('g')
+                .attr("transform",(d,i)=>`translate(${i*(rectDim+spacing)+130},${100})rotate(-60)`)
+                .append('text')
+                .text(d=>d)
+        const yLabels = mainGroup.selectAll('.text')
+            .data(data.columns.slice(1))
+            .join('g')
+            .attr("transform",(d,i)=>`translate(${0},${i*(rectDim+spacing)+120})`)
+            .append('text')
+            .text(d=>d)
+
+
+
+        ////////////////////////////////////////////////
+        /*          main update function              */
+        ////////////////////////////////////////////////
+
+        update(Array.from(state_groups),".mainGroup",marginTop=100,marginLeft=100)
+        function update(processed_data,ContainerName,marginTop=10,marginLeft=10){
+            const container = d3.select(ContainerName).append("g").attr("transform",`translate(${marginLeft},${marginTop})`)
+            const groups =container
+                .append("g")
+                .attr("transform",`translate(${20},${20})`)
+                .selectAll('.g')
+                .data(processed_data)
+                .join('g')
+                .attr("transform",(d,i)=>`translate(${0},${i*(rectDim+spacing)})`)
+                .attr("class","target").selectAll('sources')
+                .data(d=> Object.values(d[1][0]).slice(1).map(d=>isNaN(d)?0:+d))
+                .join("g")
+                .attr("transform",(d,i)=>`translate(${i*(rectDim+spacing)},${0})`)
+                .append("rect")
+                .attr("width",rectDim)
+                .attr("height",rectDim)
+                .attr('fill',d=> {
+                        return d3.interpolateGreens(Normalizer(d))
+                    }
+                )
+                .attr('opacity',.8)
+        }
+
+
+    })
+</script>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>Treemap layout (with labels)</title>
+    <script src="../js/d3.js"></script>
+
+</head>
+
+<style>
+    .title{
+        font-family: sans-serif;
+        font-size: 18pt;
+        font-style: normal;
+        text-align: center;
+    }
+    .Container{
+        padding: 10px;
+    }
+    rect {
+        opacity: 0.3;
+        stroke: white;
+        stroke-width: .1px;
+    }
+    svg{
+        width: 100vw;
+        height: 100vh;
+    }
+    text{
+        fill: #726e6e;
+        font-family: sans-serif;
+        font-size: small;
+    }
+    #tooltip{
+        font-family: sans-serif;
+        color: #5b5959;
+        alignment: center;
+        border-radius: 5px;
+        padding:10px;
+        width:160px;
+        height:40px;
+        background-color:#dbe0db;
+        top:0;
+        left:0;
+        position: absolute;
+        opacity: 0;
+    }
+    .selected
+    {
+        stroke-width: 6px;
+    }
+</style>
+
+<body>
+<div class="title">
+    United States Population
+</div>
+<div class="Container">
+<svg>
+    <g></g>
+</svg></div>
+<div id="tooltip"></div>
+
+<script>
+    d3.csv("../data/us_county_level_population.csv",d3.autoType).then( (data)=>{
+        const svg = d3.selectAll("svg");
+        const w = parseInt(svg.style("width"), 10);
+        const h = parseInt(svg.style("height"), 10);
+        const margin = 100;
+
+        // ***************************************
+        //        Color scale
+        // ***************************************
+        const color_scale = d3.scaleLinear()
+            .domain(d3.extent(d3.filter(data,(d)=>+d.COUNTY!==0), (d)=>+d.POPESTIMATE2019))
+            .range(['#1c4566','#fcae72'])
+            .interpolate(d3.interpolate)
+        // ***************************************
+        //        font size scale
+        // ***************************************
+        const font_size_scale = d3.scaleLog()
+            .domain(d3.extent(d3.filter(data, (d)=>+d.COUNTY===0), (d)=> +d.POPESTIMATE2019))
+            .range([5,20])
+        const dataGroup = d3.group(data.filter(d=>d.COUNTY!==0), d=>d.STNAME,d=>d.CTYNAME)
+        const hier_root = d3.hierarchy(dataGroup)
+        .sum(d=>d.POPESTIMATE2019).sort((a,b) => {
+            return d3.descending(a.value, b.value)});
+        const treemapLayout = d3.treemap()
+            .size([w-margin, h-margin])
+            .paddingOuter(0);
+        treemapLayout(hier_root);
+        const nodes = svg
+            .selectAll('g')
+            .data(hier_root)
+            .join('g')
+            .attr('transform',d=>`translate(${d.x0}, ${d.y0})`)
+        // add rect to svg
+        nodes
+            .append('rect')
+            .attr('width', d=>(d.x1 - d.x0))
+            .attr('height', d=>(d.y1 - d.y0))
+            .style("fill",d=> color_scale(d.value))
+        .on('mouseenter', (m,d)=>
+            {
+                const tooltip = d3.select("#tooltip")
+                tooltip.style("top",m.clientY.toString()+"px")
+                tooltip.style("left",m.clientX.toString()+"px")
+                tooltip.style("opacity",".8")
+                tooltip.html(`${d.data.CTYNAME},${d.data.STNAME} <br> ${d3.format(".0s")(d.value)}` )
+                d3.selectAll("*").classed("selected",false)
+                d3.select(event.target).classed("selected",true)
+            })
+        // add text to svg
+        nodes
+            .append('text')
+            .attr('dx', 3)
+            .attr('dy', 22)
+            .style("font-size", d=>{
+                if(d.depth===1)
+                {
+                    return parseInt(font_size_scale(d.value)).toString()+"pt"
+                }
+            })
+            .text(d=>{
+                if(d.depth===1){
+                    return `${d.data[0]}`;
+                }
+            })
+    })
+</script>
+</body>
+</html>

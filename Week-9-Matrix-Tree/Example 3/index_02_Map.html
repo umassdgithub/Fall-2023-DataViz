@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+<head>
+    <title>Treemap layout (with labels)</title>
+    <script src="../js/d3.js"></script>
+
+</head>
+
+<style>
+    .title{
+        font-family: sans-serif;
+        font-size: 18pt;
+        font-style: normal;
+        text-align: center;
+    }
+    .Container{
+        padding: 10px;
+    }
+    rect {
+        opacity: 0.3;
+        stroke: white;
+        stroke-width: .1px;
+    }
+    svg{
+        width: 100vw;
+        height: 100vh;
+    }
+    text{
+        fill: #726e6e;
+        font-family: sans-serif;
+        font-size: small;
+    }
+    #tooltip{
+        font-family: sans-serif;
+        color: #5b5959;
+        alignment: center;
+        border-radius: 5px;
+        padding:10px;
+        width:160px;
+        height:40px;
+        background-color:#dbe0db;
+        top:0;
+        left:0;
+        position: absolute;
+        opacity: 0;
+    }
+    .selected
+    {
+        stroke-width: 6px;
+    }
+</style>
+
+<body>
+<div class="title">
+    United States Population
+</div>
+<div class="Container">
+<svg>
+    <g></g>
+</svg></div>
+<div id="tooltip"></div>
+
+<script>
+    let us_treemap = {} // final clustered data
+
+    d3.csv("../data/us_county_level_population.csv",d3.autoType).then(function (data){
+
+        const svg = d3.selectAll("svg");
+        const w = parseInt(svg.style("width"), 10);
+        const h = parseInt(svg.style("height"), 10);
+        const margin = 100;
+
+        let dict ={}        // temporary variable
+
+        // ***************************************
+        //        Color scale
+        // ***************************************
+        const color_scale = d3.scaleLinear()
+            .domain(d3.extent(d3.filter(data, (d)=>{return +d.COUNTY>0}), (d)=>{return +d.POPESTIMATE2019}))
+            .range(['#1c4566','#fcae72'])
+            .interpolate(d3.interpolate)
+        // ***************************************
+        //        font size scale
+        // ***************************************
+
+        let font_size_scale = d3.scaleLog()
+            .domain(d3.extent(d3.filter(data, (d)=>{return +d.COUNTY===0}), (d)=>{return +d.POPESTIMATE2019}))
+            .range([5,20])
+
+        // ***************************************
+        //        converting flat data into
+        // ***************************************
+        us_treemap = {
+            "name":"United States", // the top root
+            "children":[]}
+
+        // another method is the nested group (see example 01), because of the form of the csv file, the
+        // nested group makes sorting very difficult
+        // const states = d3.group(data.filter(d=>d.COUNTY!==0), d=>d.STNAME,d=>d.CTYNAME);
+
+        const states = d3.group(data,(d)=>{
+            if (d["COUNTY"] === 0) {
+                dict[d.STNAME] =
+                    {
+                        name: d.STNAME,
+                        value: +d.POPESTIMATE2019,
+                        children: []
+                    }
+            } else {
+                dict[d.STNAME]["children"].push
+                (
+                    {
+                        name: d.CTYNAME,
+                        value: +d.POPESTIMATE2019,
+                    }
+                )
+            }
+            return d.STNAME
+            })
+
+        // convert group to array
+        const state_names = Array.from(states.keys())
+        state_names.forEach(function (d)
+            {
+            us_treemap["children"].push(
+                {
+                 "name":d,
+                 "children": dict[d]["children"]
+                }
+                )
+            })
+
+        // convert data into Hierarchy
+        const hier_root = d3.hierarchy(us_treemap)
+        hier_root.sum(d=>d.value).sort((a, b) => b.value - a.value)
+            .descendants();
+
+        // Create a treemap Layout
+        let treemapLayout = d3.treemap()
+            .size([w-margin, h-margin])
+            .paddingOuter(0);
+        // apply tree map to hierarchical data
+        treemapLayout(hier_root);
+        // add groups to svg
+        let nodes = svg
+            .selectAll('g')
+            .data(hier_root)
+            .enter()
+            .append('g')
+            .attr('transform', function(d) {return `translate(${d.x0}, ${d.y0})`})
+        // add rect to svg
+        nodes
+            .append('rect')
+            .attr('width', d=> d.x1 - d.x0)
+            .attr('height', d=> d.y1 - d.y0)
+            .style("fill",d=>color_scale(d.value))
+        .on('mouseenter',
+             (event,d)=>
+            {
+                const tooltip = d3.select("#tooltip")
+                tooltip.style("top",event.clientY.toString()+"px")
+                tooltip.style("left",event.clientX.toString()+"px")
+                tooltip.style("opacity",".8")
+                tooltip.html(`${d.data.name}<br> ${d3.format(".0s")(d.data.value)}` )
+                d3.selectAll("*").classed("selected",false)
+                d3.select(event.target).classed("selected",true)
+            })
+        // add text to svg
+        nodes
+            .append('text')
+            .attr('dx', 3)
+            .attr('dy', 22)
+            .style("font-size",function (d){
+                if(d.depth===1)
+                {
+                    return parseInt(font_size_scale(d.value)).toString()+"pt"
+                }
+            })
+            .text(function(d) {
+                if(d.depth===1)
+                {
+                    return d.data.name;
+                }
+                else
+                {
+                    return "";
+                }
+            })
+    })
+</script>
+</body>
+</html>
