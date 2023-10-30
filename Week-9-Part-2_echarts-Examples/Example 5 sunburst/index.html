@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Sun Burst
+    </title>
+    <script src="../lib/d3.js"></script>
+    <script src="../lib/echarts.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body style="height: 100%">
+<h1>Sun Burst</h1>
+<div id="container" style="width: 100vw;height: 100vh;margin: 30px"></div>
+<script type="text/javascript">
+
+        const dom = document.querySelector('#container');// select container
+        let tree = echarts.init(dom); // initiate echarts object
+        d3.json("../data/us_population_tree.json").then(
+            data=>
+            {
+                tree.setOption(
+                    {
+                    title: {
+                text: 'US Population',
+
+                    textStyle: {
+                    fontSize: 6,
+                        align: 'center'
+                },
+                subtextStyle: {
+                    align: 'center'
+                },
+                sublink: 'https://worldcoffeeresearch.org/work/sensory-lexicon/'
+            },
+                series: {
+                    type: 'sunburst',
+                        data: data,
+                        radius: [0, '75%'],
+                        sort: undefined,
+                        emphasis: {
+                        focus: 'ancestor'
+                    },
+                    levels: [
+                        {},
+                        {
+                            r0: '5%',
+                            r: '35%',
+                            itemStyle: {
+                                borderWidth: 2
+                            },
+                            label: {
+                                rotate: 'tangential'
+                            }
+                        },
+                        {
+                            r0: '35%',
+                            r: '70%',
+                            label: {
+                                align: 'right'
+                            }
+                        },
+                        {
+                            r0: '70%',
+                            r: '72%',
+                            label: {
+                                position: 'outside',
+                                padding: 3,
+                                silent: false
+                            },
+                            itemStyle: {
+                                borderWidth: 3
+                            }
+                        }
+                    ]
+                }}
+
+                )})
+
+
+</script>
+</body>
+</html>

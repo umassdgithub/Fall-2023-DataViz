@@ -1,0 +1,1143 @@
+[{
+   "name": "Massachusetts",
+   "children": [
+      {
+         "name": "Barnstable County",
+         "children": [
+            {
+               "name": "Barnstable Town city"
+            },
+            {
+               "name": "Bourne town"
+            },
+            {
+               "name": "Brewster town"
+            },
+            {
+               "name": "Chatham town"
+            },
+            {
+               "name": "Dennis town"
+            },
+            {
+               "name": "Eastham town"
+            },
+            {
+               "name": "Falmouth town"
+            },
+            {
+               "name": "Harwich town"
+            },
+            {
+               "name": "Mashpee town"
+            },
+            {
+               "name": "Orleans town"
+            },
+            {
+               "name": "Provincetown town"
+            },
+            {
+               "name": "Sandwich town"
+            },
+            {
+               "name": "Truro town"
+            },
+            {
+               "name": "Wellfleet town"
+            },
+            {
+               "name": "Yarmouth town"
+            }
+         ]
+      },
+      {
+         "name": "Berkshire County",
+         "children": [
+            {
+               "name": "Adams town"
+            },
+            {
+               "name": "Alford town"
+            },
+            {
+               "name": "Becket town"
+            },
+            {
+               "name": "Cheshire town"
+            },
+            {
+               "name": "Clarksburg town"
+            },
+            {
+               "name": "Dalton town"
+            },
+            {
+               "name": "Egremont town"
+            },
+            {
+               "name": "Florida town"
+            },
+            {
+               "name": "Great Barrington town"
+            },
+            {
+               "name": "Hancock town"
+            },
+            {
+               "name": "Hinsdale town"
+            },
+            {
+               "name": "Lanesborough town"
+            },
+            {
+               "name": "Lee town"
+            },
+            {
+               "name": "Lenox town"
+            },
+            {
+               "name": "Monterey town"
+            },
+            {
+               "name": "Mount Washington town"
+            },
+            {
+               "name": "New Ashford town"
+            },
+            {
+               "name": "New Marlborough town"
+            },
+            {
+               "name": "North Adams city"
+            },
+            {
+               "name": "Otis town"
+            },
+            {
+               "name": "Peru town"
+            },
+            {
+               "name": "Pittsfield city"
+            },
+            {
+               "name": "Richmond town"
+            },
+            {
+               "name": "Sandisfield town"
+            },
+            {
+               "name": "Savoy town"
+            },
+            {
+               "name": "Sheffield town"
+            },
+            {
+               "name": "Stockbridge town"
+            },
+            {
+               "name": "Tyringham town"
+            },
+            {
+               "name": "Washington town"
+            },
+            {
+               "name": "West Stockbridge town"
+            },
+            {
+               "name": "Williamstown town"
+            },
+            {
+               "name": "Windsor town"
+            }
+         ]
+      },
+      {
+         "name": "Bristol County",
+         "children": [
+            {
+               "name": "County subdivisions not defined"
+            },
+            {
+               "name": "Acushnet town"
+            },
+            {
+               "name": "Attleboro city"
+            },
+            {
+               "name": "Berkley town"
+            },
+            {
+               "name": "Dartmouth town"
+            },
+            {
+               "name": "Dighton town"
+            },
+            {
+               "name": "Easton town"
+            },
+            {
+               "name": "Fairhaven town"
+            },
+            {
+               "name": "Fall River city"
+            },
+            {
+               "name": "Freetown town"
+            },
+            {
+               "name": "Mansfield town"
+            },
+            {
+               "name": "New Bedford city"
+            },
+            {
+               "name": "North Attleborough Town city"
+            },
+            {
+               "name": "Norton town"
+            },
+            {
+               "name": "Raynham town"
+            },
+            {
+               "name": "Rehoboth town"
+            },
+            {
+               "name": "Seekonk town"
+            },
+            {
+               "name": "Somerset town"
+            },
+            {
+               "name": "Swansea town"
+            },
+            {
+               "name": "Taunton city"
+            },
+            {
+               "name": "Westport town"
+            }
+         ]
+      },
+      {
+         "name": "Dukes County",
+         "children": [
+            {
+               "name": "Aquinnah town"
+            },
+            {
+               "name": "Chilmark town"
+            },
+            {
+               "name": "Edgartown town"
+            },
+            {
+               "name": "Gosnold town"
+            },
+            {
+               "name": "Oak Bluffs town"
+            },
+            {
+               "name": "Tisbury town"
+            },
+            {
+               "name": "West Tisbury town"
+            }
+         ]
+      },
+      {
+         "name": "Essex County",
+         "children": [
+            {
+               "name": "County subdivisions not defined"
+            },
+            {
+               "name": "Amesbury Town city"
+            },
+            {
+               "name": "Andover town"
+            },
+            {
+               "name": "Beverly city"
+            },
+            {
+               "name": "Boxford town"
+            },
+            {
+               "name": "Danvers town"
+            },
+            {
+               "name": "Essex town"
+            },
+            {
+               "name": "Georgetown town"
+            },
+            {
+               "name": "Gloucester city"
+            },
+            {
+               "name": "Groveland town"
+            },
+            {
+               "name": "Hamilton town"
+            },
+            {
+               "name": "Haverhill city"
+            },
+            {
+               "name": "Ipswich town"
+            },
+            {
+               "name": "Lawrence city"
+            },
+            {
+               "name": "Lynn city"
+            },
+            {
+               "name": "Lynnfield town"
+            },
+            {
+               "name": "Manchester-by-the-Sea town"
+            },
+            {
+               "name": "Marblehead town"
+            },
+            {
+               "name": "Merrimac town"
+            },
+            {
+               "name": "Methuen Town city"
+            },
+            {
+               "name": "Middleton town"
+            },
+            {
+               "name": "Nahant town"
+            },
+            {
+               "name": "Newbury town"
+            },
+            {
+               "name": "Newburyport city"
+            },
+            {
+               "name": "North Andover town"
+            },
+            {
+               "name": "Peabody city"
+            },
+            {
+               "name": "Rockport town"
+            },
+            {
+               "name": "Rowley town"
+            },
+            {
+               "name": "Salem city"
+            },
+            {
+               "name": "Salisbury town"
+            },
+            {
+               "name": "Saugus town"
+            },
+            {
+               "name": "Swampscott town"
+            },
+            {
+               "name": "Topsfield town"
+            },
+            {
+               "name": "Wenham town"
+            },
+            {
+               "name": "West Newbury town"
+            }
+         ]
+      },
+      {
+         "name": "Franklin County",
+         "children": [
+            {
+               "name": "Ashfield town"
+            },
+            {
+               "name": "Bernardston town"
+            },
+            {
+               "name": "Buckland town"
+            },
+            {
+               "name": "Charlemont town"
+            },
+            {
+               "name": "Colrain town"
+            },
+            {
+               "name": "Conway town"
+            },
+            {
+               "name": "Deerfield town"
+            },
+            {
+               "name": "Erving town"
+            },
+            {
+               "name": "Gill town"
+            },
+            {
+               "name": "Greenfield city"
+            },
+            {
+               "name": "Hawley town"
+            },
+            {
+               "name": "Heath town"
+            },
+            {
+               "name": "Leverett town"
+            },
+            {
+               "name": "Leyden town"
+            },
+            {
+               "name": "Monroe town"
+            },
+            {
+               "name": "Montague town"
+            },
+            {
+               "name": "New Salem town"
+            },
+            {
+               "name": "Northfield town"
+            },
+            {
+               "name": "Orange town"
+            },
+            {
+               "name": "Rowe town"
+            },
+            {
+               "name": "Shelburne town"
+            },
+            {
+               "name": "Shutesbury town"
+            },
+            {
+               "name": "Sunderland town"
+            },
+            {
+               "name": "Warwick town"
+            },
+            {
+               "name": "Wendell town"
+            },
+            {
+               "name": "Whately town"
+            }
+         ]
+      },
+      {
+         "name": "Hampden County",
+         "children": [
+            {
+               "name": "Agawam Town city"
+            },
+            {
+               "name": "Blandford town"
+            },
+            {
+               "name": "Brimfield town"
+            },
+            {
+               "name": "Chester town"
+            },
+            {
+               "name": "Chicopee city"
+            },
+            {
+               "name": "East Longmeadow town"
+            },
+            {
+               "name": "Granville town"
+            },
+            {
+               "name": "Hampden town"
+            },
+            {
+               "name": "Holland town"
+            },
+            {
+               "name": "Holyoke city"
+            },
+            {
+               "name": "Longmeadow town"
+            },
+            {
+               "name": "Ludlow town"
+            },
+            {
+               "name": "Monson town"
+            },
+            {
+               "name": "Montgomery town"
+            },
+            {
+               "name": "Palmer Town city"
+            },
+            {
+               "name": "Russell town"
+            },
+            {
+               "name": "Southwick town"
+            },
+            {
+               "name": "Springfield city"
+            },
+            {
+               "name": "Tolland town"
+            },
+            {
+               "name": "Wales town"
+            },
+            {
+               "name": "Westfield city"
+            },
+            {
+               "name": "West Springfield Town city"
+            },
+            {
+               "name": "Wilbraham town"
+            }
+         ]
+      },
+      {
+         "name": "Hampshire County",
+         "children": [
+            {
+               "name": "Amherst Town city"
+            },
+            {
+               "name": "Belchertown town"
+            },
+            {
+               "name": "Chesterfield town"
+            },
+            {
+               "name": "Cummington town"
+            },
+            {
+               "name": "Easthampton Town city"
+            },
+            {
+               "name": "Goshen town"
+            },
+            {
+               "name": "Granby town"
+            },
+            {
+               "name": "Hadley town"
+            },
+            {
+               "name": "Hatfield town"
+            },
+            {
+               "name": "Huntington town"
+            },
+            {
+               "name": "Middlefield town"
+            },
+            {
+               "name": "Northampton city"
+            },
+            {
+               "name": "Pelham town"
+            },
+            {
+               "name": "Plainfield town"
+            },
+            {
+               "name": "Southampton town"
+            },
+            {
+               "name": "South Hadley town"
+            },
+            {
+               "name": "Ware town"
+            },
+            {
+               "name": "Westhampton town"
+            },
+            {
+               "name": "Williamsburg town"
+            },
+            {
+               "name": "Worthington town"
+            }
+         ]
+      },
+      {
+         "name": "Middlesex County",
+         "children": [
+            {
+               "name": "Acton town"
+            },
+            {
+               "name": "Arlington town"
+            },
+            {
+               "name": "Ashby town"
+            },
+            {
+               "name": "Ashland town"
+            },
+            {
+               "name": "Ayer town"
+            },
+            {
+               "name": "Bedford town"
+            },
+            {
+               "name": "Belmont town"
+            },
+            {
+               "name": "Billerica town"
+            },
+            {
+               "name": "Boxborough town"
+            },
+            {
+               "name": "Burlington town"
+            },
+            {
+               "name": "Cambridge city"
+            },
+            {
+               "name": "Carlisle town"
+            },
+            {
+               "name": "Chelmsford town"
+            },
+            {
+               "name": "Concord town"
+            },
+            {
+               "name": "Dracut town"
+            },
+            {
+               "name": "Dunstable town"
+            },
+            {
+               "name": "Everett city"
+            },
+            {
+               "name": "Framingham city"
+            },
+            {
+               "name": "Groton town"
+            },
+            {
+               "name": "Holliston town"
+            },
+            {
+               "name": "Hopkinton town"
+            },
+            {
+               "name": "Hudson town"
+            },
+            {
+               "name": "Lexington town"
+            },
+            {
+               "name": "Lincoln town"
+            },
+            {
+               "name": "Littleton town"
+            },
+            {
+               "name": "Lowell city"
+            },
+            {
+               "name": "Malden city"
+            },
+            {
+               "name": "Marlborough city"
+            },
+            {
+               "name": "Maynard town"
+            },
+            {
+               "name": "Medford city"
+            },
+            {
+               "name": "Melrose city"
+            },
+            {
+               "name": "Natick town"
+            },
+            {
+               "name": "Newton city"
+            },
+            {
+               "name": "North Reading town"
+            },
+            {
+               "name": "Pepperell town"
+            },
+            {
+               "name": "Reading town"
+            },
+            {
+               "name": "Sherborn town"
+            },
+            {
+               "name": "Shirley town"
+            },
+            {
+               "name": "Somerville city"
+            },
+            {
+               "name": "Stoneham town"
+            },
+            {
+               "name": "Stow town"
+            },
+            {
+               "name": "Sudbury town"
+            },
+            {
+               "name": "Tewksbury town"
+            },
+            {
+               "name": "Townsend town"
+            },
+            {
+               "name": "Tyngsborough town"
+            },
+            {
+               "name": "Wakefield town"
+            },
+            {
+               "name": "Waltham city"
+            },
+            {
+               "name": "Watertown Town city"
+            },
+            {
+               "name": "Wayland town"
+            },
+            {
+               "name": "Westford town"
+            },
+            {
+               "name": "Weston town"
+            },
+            {
+               "name": "Wilmington town"
+            },
+            {
+               "name": "Winchester town"
+            },
+            {
+               "name": "Woburn city"
+            }
+         ]
+      },
+      {
+         "name": "Nantucket County",
+         "children": [
+            {
+               "name": "County subdivisions not defined"
+            },
+            {
+               "name": "Nantucket town"
+            }
+         ]
+      },
+      {
+         "name": "Norfolk County",
+         "children": [
+            {
+               "name": "Avon town"
+            },
+            {
+               "name": "Bellingham town"
+            },
+            {
+               "name": "Braintree Town city"
+            },
+            {
+               "name": "Brookline town"
+            },
+            {
+               "name": "Canton town"
+            },
+            {
+               "name": "Cohasset town"
+            },
+            {
+               "name": "Dedham town"
+            },
+            {
+               "name": "Dover town"
+            },
+            {
+               "name": "Foxborough town"
+            },
+            {
+               "name": "Franklin Town city"
+            },
+            {
+               "name": "Holbrook town"
+            },
+            {
+               "name": "Medfield town"
+            },
+            {
+               "name": "Medway town"
+            },
+            {
+               "name": "Millis town"
+            },
+            {
+               "name": "Milton town"
+            },
+            {
+               "name": "Needham town"
+            },
+            {
+               "name": "Norfolk town"
+            },
+            {
+               "name": "Norwood town"
+            },
+            {
+               "name": "Plainville town"
+            },
+            {
+               "name": "Quincy city"
+            },
+            {
+               "name": "Randolph Town city"
+            },
+            {
+               "name": "Sharon town"
+            },
+            {
+               "name": "Stoughton town"
+            },
+            {
+               "name": "Walpole town"
+            },
+            {
+               "name": "Wellesley town"
+            },
+            {
+               "name": "Westwood town"
+            },
+            {
+               "name": "Weymouth Town city"
+            },
+            {
+               "name": "Wrentham town"
+            }
+         ]
+      },
+      {
+         "name": "Plymouth County",
+         "children": [
+            {
+               "name": "County subdivisions not defined"
+            },
+            {
+               "name": "Abington town"
+            },
+            {
+               "name": "Bridgewater Town city"
+            },
+            {
+               "name": "Brockton city"
+            },
+            {
+               "name": "Carver town"
+            },
+            {
+               "name": "Duxbury town"
+            },
+            {
+               "name": "East Bridgewater town"
+            },
+            {
+               "name": "Halifax town"
+            },
+            {
+               "name": "Hanover town"
+            },
+            {
+               "name": "Hanson town"
+            },
+            {
+               "name": "Hingham town"
+            },
+            {
+               "name": "Hull town"
+            },
+            {
+               "name": "Kingston town"
+            },
+            {
+               "name": "Lakeville town"
+            },
+            {
+               "name": "Marion town"
+            },
+            {
+               "name": "Marshfield town"
+            },
+            {
+               "name": "Mattapoisett town"
+            },
+            {
+               "name": "Middleborough town"
+            },
+            {
+               "name": "Norwell town"
+            },
+            {
+               "name": "Pembroke town"
+            },
+            {
+               "name": "Plymouth town"
+            },
+            {
+               "name": "Plympton town"
+            },
+            {
+               "name": "Rochester town"
+            },
+            {
+               "name": "Rockland town"
+            },
+            {
+               "name": "Scituate town"
+            },
+            {
+               "name": "Wareham town"
+            },
+            {
+               "name": "West Bridgewater town"
+            },
+            {
+               "name": "Whitman town"
+            }
+         ]
+      },
+      {
+         "name": "Suffolk County",
+         "children": [
+            {
+               "name": "County subdivisions not defined"
+            },
+            {
+               "name": "Boston city"
+            },
+            {
+               "name": "Chelsea city"
+            },
+            {
+               "name": "Revere city"
+            },
+            {
+               "name": "Winthrop Town city"
+            }
+         ]
+      },
+      {
+         "name": "Worcester County",
+         "children": [
+            {
+               "name": "Ashburnham town"
+            },
+            {
+               "name": "Athol town"
+            },
+            {
+               "name": "Auburn town"
+            },
+            {
+               "name": "Barre town"
+            },
+            {
+               "name": "Berlin town"
+            },
+            {
+               "name": "Blackstone town"
+            },
+            {
+               "name": "Bolton town"
+            },
+            {
+               "name": "Boylston town"
+            },
+            {
+               "name": "Brookfield town"
+            },
+            {
+               "name": "Charlton town"
+            },
+            {
+               "name": "Clinton town"
+            },
+            {
+               "name": "Douglas town"
+            },
+            {
+               "name": "Dudley town"
+            },
+            {
+               "name": "East Brookfield town"
+            },
+            {
+               "name": "Fitchburg city"
+            },
+            {
+               "name": "Gardner city"
+            },
+            {
+               "name": "Grafton town"
+            },
+            {
+               "name": "Hardwick town"
+            },
+            {
+               "name": "Harvard town"
+            },
+            {
+               "name": "Holden town"
+            },
+            {
+               "name": "Hopedale town"
+            },
+            {
+               "name": "Hubbardston town"
+            },
+            {
+               "name": "Lancaster town"
+            },
+            {
+               "name": "Leicester town"
+            },
+            {
+               "name": "Leominster city"
+            },
+            {
+               "name": "Lunenburg town"
+            },
+            {
+               "name": "Mendon town"
+            },
+            {
+               "name": "Milford town"
+            },
+            {
+               "name": "Millbury town"
+            },
+            {
+               "name": "Millville town"
+            },
+            {
+               "name": "New Braintree town"
+            },
+            {
+               "name": "Northborough town"
+            },
+            {
+               "name": "Northbridge town"
+            },
+            {
+               "name": "North Brookfield town"
+            },
+            {
+               "name": "Oakham town"
+            },
+            {
+               "name": "Oxford town"
+            },
+            {
+               "name": "Paxton town"
+            },
+            {
+               "name": "Petersham town"
+            },
+            {
+               "name": "Phillipston town"
+            },
+            {
+               "name": "Princeton town"
+            },
+            {
+               "name": "Royalston town"
+            },
+            {
+               "name": "Rutland town"
+            },
+            {
+               "name": "Shrewsbury town"
+            },
+            {
+               "name": "Southborough town"
+            },
+            {
+               "name": "Southbridge Town city"
+            },
+            {
+               "name": "Spencer town"
+            },
+            {
+               "name": "Sterling town"
+            },
+            {
+               "name": "Sturbridge town"
+            },
+            {
+               "name": "Sutton town"
+            },
+            {
+               "name": "Templeton town"
+            },
+            {
+               "name": "Upton town"
+            },
+            {
+               "name": "Uxbridge town"
+            },
+            {
+               "name": "Warren town"
+            },
+            {
+               "name": "Webster town"
+            },
+            {
+               "name": "Westborough town"
+            },
+            {
+               "name": "West Boylston town"
+            },
+            {
+               "name": "West Brookfield town"
+            },
+            {
+               "name": "Westminster town"
+            },
+            {
+               "name": "Winchendon town"
+            },
+            {
+               "name": "Worcester city"
+            }
+         ]
+      }
+   ]
+}]

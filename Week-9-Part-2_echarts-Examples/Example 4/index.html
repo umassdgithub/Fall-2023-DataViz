@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Tree Cluster
+    </title>
+    <script src="../lib/d3.js"></script>
+    <script src="../lib/echarts.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body style="height: 100%">
+<h1>Tree Cluster</h1>
+<div id="container" style="width: 90vw;height: 90vh;margin: 30px"></div>
+<script type="text/javascript">
+
+        const dom = document.querySelector('#container');// select container
+        let tree = echarts.init(dom); // initiate echarts object
+        d3.json("../data/Mass.json").then(
+            data=>
+            {
+                tree.setOption(
+                    ({
+                        tooltip: {
+                            trigger: 'item',
+                            triggerOn: 'mousemove'
+                        },
+                        textStyle:{
+                            fontSize: 14
+                        },
+                        series: [
+                            {
+                                type: 'tree',
+                                data: data,
+                                top: '20%',
+                                bottom: '14%',
+                                layout: 'radial',
+                                symbol: 'emptyRect',
+                                symbolSize: 2,
+                                initialTreeDepth: 1,
+                                animationDurationUpdate: 2000,
+                                emphasis: {
+                                    focus: 'descendant'
+                                }
+                            }
+                        ]
+                    })
+                );
+            })
+
+</script>
+</body>
+</html>

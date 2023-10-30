@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Simple Scatter Plot with Data Zoom
+    </title>
+    <script src="../lib/d3.js"></script>
+    <script src="../lib/echarts.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body style="height: 100%">
+<h1>Simple Scatter Plot with Data Zoom</h1>
+<div id="container" style="width: 60vw;height: 60vh;margin: 30px"></div>
+<script type="text/javascript">
+
+        const dom = document.querySelector('#container');// select container
+        let scatter = echarts.init(dom); // initiate echarts object
+        scatter.setOption (
+            {
+                xAxis: {},
+                yAxis: {},
+                dataZoom: [
+                    {
+                        type: 'slider',
+                            //inside: This type creates a data zoom that covers the entire chart plot area.
+                                    // Users can zoom in and out by scrolling
+                                    // with the mouse or using touch gestures.
+                            // sliderInside: This type combines the features of both "slider" and "inside."
+                                    // It provides a slider bar, but it's placed inside the chart plot area,
+                                    // making it useful when you want a slider that doesn't take up additional space.
+                            // selectInside: Similar to "select," this type creates a selection box inside the chart plot area.
+                                    // Users can click and drag to select the region they want to zoom in on.
+                        show: true,
+                        xAxisIndex: [0], // xAxis
+                                        // [0, 1], // This data zoom affects both xaxes with index 0 and 1
+                        start: 1,
+                        end: 35
+                    }],
+                series: [
+                    {
+                        symbolSize: 20,
+                        data: [
+                            [10.0, 8.04],
+                            [8.07, 6.95],
+                            [13.0, 7.58],
+                            [9.05, 8.81],
+                            [11.0, 8.33],
+                            [14.0, 7.66],
+                            [13.4, 6.81],
+                            [10.0, 6.33],
+                            [14.0, 8.96],
+                            [12.5, 6.82],
+                            [9.15, 7.2],
+                            [11.5, 7.2],
+                            [3.03, 4.23],
+                            [12.2, 7.83],
+                            [2.02, 4.47],
+                            [1.05, 3.33],
+                            [4.05, 4.96],
+                            [6.03, 7.24],
+                            [12.0, 6.26],
+                            [12.0, 8.84],
+                            [7.08, 5.82],
+                            [5.02, 5.68]
+                        ],
+                        type: 'scatter',
+                    }
+                ]
+            }
+        );
+
+</script>
+</body>
+</html>
