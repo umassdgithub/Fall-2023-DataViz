@@ -1,0 +1,9 @@
+[
+  {"name":"Mercury" , "color":"#504E51", "diameter": 4880,   "distance": 57910000,  "year": 88},
+  {"name":"Venus" ,   "color":"#BBB7AB", "diameter": 12104,  "distance": 108200000, "year": 225},
+  {"name":"Earth" ,   "color":"#D8F7FF", "diameter": 12756,  "distance": 149600000, "year": 365},
+  {"name":"Mars" ,    "color":"#C67B5C", "diameter": 6794,   "distance": 227940000, "year": 687},
+  {"name":"Jupiter" , "color":"#D39C7E", "diameter": 142984, "distance": 778330000, "year": 4380},
+  {"name":"Saturn" ,  "color":"#C3A171", "diameter": 120536, "distance": 1429400000,"year": 10585},
+  {"name":"Uranus" ,  "color":"#65868B", "diameter": 51118,  "distance": 2870990000,"year": 30660},
+  {"name":"Neptune" , "color":"#6081FF", "diameter": 49532,  "distance": 4504000000,"year": 60225}]
