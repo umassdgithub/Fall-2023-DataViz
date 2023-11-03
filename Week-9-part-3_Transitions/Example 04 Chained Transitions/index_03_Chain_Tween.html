@@ -24,17 +24,21 @@
         return {"cx": d3.randomNormal(300,70)() ,"cy":d3.randomNormal(300,70)() ,"r": d3.randomUniform(5,10)()}
     });
 
-    let circles = d3.select('svg')
+    // The data is binded to the elements
+    const circles = d3.select('svg')
         .selectAll('circles')
         .data(data)
         .enter()
-        .append('circle')
-        .attr("cx",function (d) {return d.cx}).attr("cy",function (d) {return d.cy})
-        .attr("r",function (d) {return d.r}).attr('fill','steelblue')
+        .append('circle')       // A circle element is added for each data point
+        .attr("cx",d=>d.cx)     // the initial x, y and r value for the points are set
+        .attr("cy",d=>d.cy)
+        .attr("r", d=>d.r)
+        .attr('fill','steelblue')
 
+    // In this section the transition for the elements are added
     circles.transition()
-        .duration(2500)
-        .delay(function(d,i){return i + d3.randomUniform()()*(2000)})
+        .duration(2500) // duration of the transition is 2500 ms
+        .delay((_,i)=>i + d3.randomUniform()()*(2000)) // each one of the elements get a delay based on the index of the element
         .on("start", function repeat() {
             d3.active(this)
                 .attr("cx", d3.randomNormal(300,70)())

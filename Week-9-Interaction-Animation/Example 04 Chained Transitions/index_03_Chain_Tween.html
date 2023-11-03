@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Style Tween</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+            font-size: larger;
+        }
+        circle{
+            fill-opacity: .2;
+        }
+    </style>
+</head>
+<body>
+<svg width="100vw" height="100vh">
+</svg>
+
+<script>
+
+    let data = d3.map(d3.range(0,1000),function (d) {
+        return {"cx": d3.randomNormal(300,70)() ,"cy":d3.randomNormal(300,70)() ,"r": d3.randomUniform(5,10)()}
+    });
+
+    let circles = d3.select('svg')
+        .selectAll('circles')
+        .data(data)
+        .enter()
+        .append('circle')
+        .attr("cx",function (d) {return d.cx}).attr("cy",function (d) {return d.cy})
+        .attr("r",function (d) {return d.r}).attr('fill','steelblue')
+
+    circles.transition()
+        .duration(2500)
+        .delay(function(d,i){return i + d3.randomUniform()()*(2000)})
+        .on("start", function repeat() {
+            d3.active(this)
+                .attr("cx", d3.randomNormal(300,70)())
+                .attr("cy", d3.randomNormal(300,70)())
+                .attr("fill","orange")
+                .transition()
+                .attr("cx", d3.randomNormal(300,70)())
+                .attr("cy", d3.randomNormal(300,70)())
+                .attr("fill","steelblue")
+                .transition()
+                .on("start", repeat);});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Solar System</title>
+    <script src="../lib/d3.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+        svg{
+            padding: 20px;
+        }
+        .backScene{
+            fill:#040404;
+        }
+        .sun{
+        fill:#dc9a1f;
+        stroke-width:10px;
+        stroke:#dc7514;
+        stroke-opacity:0.3;
+        }
+        .orbitPaths{
+        fill:none;
+        stroke-width: 1px;
+        stroke:white;
+        stroke-opacity: .5;
+        stroke-dasharray: 5;
+        }
+    </style>
+</head>
+<body>
+<svg viewBox="0 0 500 500" width="50vw" height="50vw"></svg>
+<script>
+    // Load data
+    d3.json("data/data.json").then(solarSystem=>
+    {
+        // Use the distance, and set an scaleLog for the distance of the planets
+        let distance_scale = d3.scaleLog()
+            .domain(d3.extent(solarSystem,d=>d.distance))
+            .range([50,200]);// adjusted
+
+        // rotation scale based on the year days data
+        let rotation_scale = d3.scaleLog()
+            .domain(d3.extent(solarSystem,d=>d.year))
+            .range([60,4]);// adjusted
+        // Diameter of the planets
+        let diameter_scale = d3.scaleLinear()
+            .domain(d3.extent(solarSystem,d=>d.diameter))
+            .range([3,10]);// adjusted
+
+        // select svg elements
+        let svg = d3.select("svg");
+        // append background! backScene class sets the style
+        svg.append('rect')
+            .attr("x",0)
+            .attr("y",0)
+            .attr("width","100%")
+            .attr("height","100%")
+            .attr("class","backScene")
+
+
+        // Append the solarOrbits group
+        let solarOrbits = svg.append('g')
+
+        // append the SUN manually
+        solarOrbits.append("circle")
+            .attr("cx",250).attr("cy",250).attr("r",15) // adjusted
+            .attr("class","sun") // refer to the styles for the sun class info
+
+        // append path of the orbits
+        solarOrbits.selectAll('.orbits')
+            .data(solarSystem)          // bind data
+            .enter()
+            .append("circle")           // append circles which indicate the path of the rotation
+            .attr("class","orbits")
+            .attr("cx",250).attr("cy",250) // adjusted
+            .attr("r",d=>distance_scale(d.distance))
+            .attr("class","orbitPaths")
+
+        // append a group for the planets
+        let miniCircles = svg.append("g").attr("transform","translate(250,250)")
+
+
+        // Bind data
+        // for each planet append a new group
+        miniCircles = miniCircles.selectAll('elements')
+            .data(solarSystem).enter().append("g");
+
+        //append a circle to each planet
+        miniCircles.append("circle")
+            .attr("r",(d,i)=>diameter_scale(d.diameter))
+            .attr("fill",d=>d.color) // use values from the dataset
+
+        // append name of the planet
+        miniCircles.append("text")
+            .text(d=>d.name).attr("dx","12px").attr("fill","#bbbbbb").style("font-size","7pt")
+
+        // use limited number of rotations
+        miniCircles.transition()
+            .duration(1000*60*3).ease(d3.easeLinear) //  the animation runs for 3 minutes!
+            .attrTween("transform",(d,i)=>{
+                //let rndFactor = d3.randomInt(2,120)() //this is just to start planets motion from random location
+                return t=>{
+                    //t=t+rndFactor;
+                    let x_p = Math.cos(2*Math.PI*t*rotation_scale(d.year))*distance_scale(d.distance)
+                    let y_p = Math.sin(2*Math.PI*t*(rotation_scale(d.year)))*distance_scale(d.distance)
+                    return `translate(${x_p},${y_p})`
+                }});
+    })
+
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animation, Transition Delay</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<input type="Button" value="Generate" id="Generate">
+<input type="Button" value="Run" id="Run">
+
+<svg width="100vw" height="100vh" id="canvas">
+</svg>
+
+<script>
+
+    // step 1 get SVG element
+    let svg = d3.select("svg");
+
+    // get the height and width
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    // make a small rect dimensions
+
+
+function generate() {
+    for(let i=0;i<1000;i++)
+    {
+
+        svg.append('circle')
+            .attr('cx',d3.randomUniform()()*width)
+            .attr('cy',d3.randomUniform()()*height)
+            .attr('r',d3.randomUniform()()*15)
+            .attr('fill',function () {
+                return d3.rgb(d3.randomUniform()()*255,d3.randomUniform()()*255,d3.randomUniform()()*255)
+            })
+            .attr('class','shapes')
+    }
+
+}
+
+    d3.select("#Run").on("click",function () {
+        d3.selectAll(".shapes")
+            .transition() // transition to green!
+            .duration(1000)
+            .attr("fill", "green")
+            .transition() // Then red.
+            .duration(1000)
+            .style("fill", "red")
+            .transition() //  Remove 1 by 1
+            .delay(function (d,i) {
+                return i*10
+            })
+            .style("fill", "brown")
+            .remove();
+    })
+
+    d3.select("#Generate").on("click",generate);
+
+
+
+</script>
+</body>
+</html>

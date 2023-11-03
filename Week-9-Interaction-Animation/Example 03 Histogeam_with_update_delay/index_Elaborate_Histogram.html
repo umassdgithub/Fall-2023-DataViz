@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Histogram, Transition Delay</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<input type="button" value="Update" id="update">
+
+<svg width="100vw" height="100vh" id="canvas">
+</svg>
+
+<script>
+
+    // step 1 get SVG element
+    let svg = d3.select("svg");
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let margins = 10;
+
+    function generate_random_data(n=10000,mu=5,sigma = 3) {
+        let normal_random = d3.randomNormal(mu,sigma);
+        let lst_rnds = [];
+        for(let i=0;i<=n;i++){
+            lst_rnds.push(normal_random())
+        }
+        return lst_rnds
+    }
+
+    function histogram(data,bin_number=10,fig_width=100, fig_height=100, margins=10,xLabel='bins',yLabel ='Frequency') {
+
+        const figure = svg.append("g").attr("transform",`translate(${margins},${margins})`).attr("class","figure")
+
+        // get min max of the array we want to calculate histogram
+        let x_extent= [];
+        let data_range;
+        let step_size;
+        let bins = [];
+        let bin_Frequency = []
+        let xScale;
+        let yScale;
+
+        function make_scales()
+        {
+            // get min max of the array we want to calculate histogram
+            x_extent = d3.extent(data,function (d) { return d;});
+            // use number of bins to calculate the steps for thresholds used in binning
+            // step 1: max of extent - min of extent --> range of x values
+            data_range = Math.abs(x_extent[1]-x_extent[0]);
+            // step 2: range/number of bins, will be the step size
+            step_size =  data_range / bin_number;
+            // step 3 make bin function based on the steps sizes and the extents of data
+            bins = d3.range(x_extent[0],x_extent[1],step_size);
+            // step 4 calculate the frequencies
+            let bin_function = d3.bin().thresholds(bins);
+            let bin_Frequency_values = bin_function(d3.map(data,function (d) {return d;}));
+            // step 5 count the number of elements in each bin
+            bin_Frequency = d3.map(bin_Frequency_values,function (d) {return d.length})
+            xScale = d3.scaleLinear()
+                .domain([0,bin_number])
+                .range([0,fig_width]);
+            yScale = d3.scaleLinear()
+                .domain([0,d3.max(bin_Frequency,function (d) {return d;})])
+                .range([fig_height,0]);
+        }
+        make_scales()
+        figure.selectAll('.figure')
+            .data(bin_Frequency)
+            .enter()
+            .append('rect')
+            .attr('x',function (d,i) {
+                return xScale(i)
+            })
+
+            .attr('width',function () {
+                return (fig_width/bin_number)*.95
+            })
+            .attr('y',function (d) {
+                return yScale(d);
+            })
+            .attr('height',function (d) {
+                return fig_height-yScale(d);
+            })
+            .attr('fill','steelblue');
+
+        d3.select("#update").on("click", function()
+        {
+            data = generate_random_data();
+            updateData();
+
+        });
+
+        // x and y Axis function
+        let x_axis = d3.axisBottom(xScale).ticks(4)
+        let y_axis = d3.axisLeft(yScale).ticks(4)
+        //X Axis
+        figure.append("g").attr("class","axis")
+            .attr("transform", `translate(${0},${fig_height})`)
+            .call(x_axis);
+        // Y Axis
+        figure.append("g").attr("class","axis")
+            .attr("transform", `translate(${0},${0})`)
+            .call(y_axis);
+        // Labels
+        figure.append("g").attr("class","label")
+            .attr("transform", `translate(${fig_width/2},${fig_height+margins/2})`)
+            .append("text")
+            .attr("class","label")
+            .text(xLabel);
+        figure.append("g")
+            .attr("transform", `translate(${-margins/1.5},${fig_height/2}) rotate(270)`)
+            .append("text")
+            .attr("class","label")
+            .text(yLabel);
+
+
+
+        /*
+        Update data function is used to create another set of random numbers and update the histogram
+         */
+        function updateData() {
+            make_scales();
+            figure.selectAll("rect")
+                .data(bin_Frequency)
+                .transition()
+                .attr("y", function(d){
+                    return yScale(d);//fig_height-yScale(d)
+                })
+                .attr("height", function(d) {
+                    return fig_height-yScale(d);
+                })
+                .delay(function (d,i) {
+                    return i* 20;
+                })
+                .ease(d3.easeBounceOut)
+            figure.selectAll("rect")
+                .on("mouseover", function(d){
+                })
+                .on("mousemove", function(d){
+                })
+                .on("mouseout", function(d){
+                });
+        }
+        /*
+        End of update data function
+         */
+
+        return {"bins":bins,"heights":bin_Frequency} // the function returns the number of bins and frequecy (just like numpy.histogram())
+    }
+
+    data = generate_random_data()
+    histogram(data,bin_number=50,fig_width=500, fig_height=300, margins=50)
+
+
+</script>
+</body>
+</html>

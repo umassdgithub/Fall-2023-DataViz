@@ -16,6 +16,7 @@
     // ## Step 1:
     // ### select the div - append the echarts graph to it
     const dom = document.querySelector('#main')
+
     const myChart = echarts.init(dom);
 
     // ## Step 2:
@@ -79,7 +80,7 @@
         legend: //https://echarts.apache.org/en/option.html#legend.tooltip
             {
                 data: ['Buy','Sell'],
-                icon:'circle' //'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow', 'none'
+                icon:'triangle' //'circle', 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow', 'none'
          },
 
         // ## Step 7: Setting the axis

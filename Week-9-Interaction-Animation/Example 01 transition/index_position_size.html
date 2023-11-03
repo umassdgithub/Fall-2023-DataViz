@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Position and Size transition</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<svg width="100vw" height="100vh" id="canvas">
+</svg>
+
+<script>
+    // step 1 get SVG element
+    let svg = d3.select("svg");
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let rect_height = .15 * height;
+    let rect_width = .15 * height;
+    // step 2 append a rect to svg's center
+    let rect =svg.append("g").attr("class","container").attr("transform",`translate(${(width-rect_width)/2},${(height-rect_height)/2}) rotate(0)`)
+        .append("rect")
+        .attr('width',rect_width)
+        .attr('height',rect_height);
+    // step 3 assign attribute color to red
+    rect.attr("fill","red");
+    // Step 4 use d3 transition to change Size
+    d3.select("rect")
+        .transition()
+        .duration(2500)
+        .attr("width",`${rect_width*2}`)
+        .attr("height",`${rect_height*2}`)
+
+
+
+</script>
+</body>
+</html>

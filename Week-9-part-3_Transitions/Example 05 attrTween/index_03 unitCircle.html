@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unit Circle</title>
+    <script src="../lib/d3.js"></script>
+
+</head>
+<body>
+<svg width="100vw" height="100vh"></svg>
+<script>
+    const svg = d3
+            .select("svg")
+            .append("g")
+            .attr("transform","translate(200,200)")
+    svg.append("circle").attr("r",100).attr("fill","none").attr("stroke","black")
+    const marker = svg.append("circle").attr("r",10).attr("fill","red")
+
+    marker
+        .transition()
+        .duration(10000)
+        .ease(d3.easeLinear) //  the animation runs for 3 minutes!
+        .attrTween("transform",function(d)
+    {
+    // this function at each time t=0 to 1, will return the value to transform the circle
+        return (t)=>{
+            let x_p = Math.cos(2*Math.PI*t*5)* 100
+            console.log(t)
+            let y_p = Math.sin(2*Math.PI*t*5)* 100
+            return `translate(${x_p},${y_p})`
+        }
+    })
+</script>
+</body>
+</html>

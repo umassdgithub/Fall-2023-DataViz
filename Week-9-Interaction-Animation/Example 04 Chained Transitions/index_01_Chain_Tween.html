@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Style Tween</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body{
+            font-family: sans-serif;
+            font-size: larger;
+        }
+    </style>
+</head>
+<body>
+<svg width="100vw" height="100vh">
+</svg>
+
+<script>
+
+
+    let circle = d3.select('svg')
+        .append('circle')
+        .attr("cx",100)
+        .attr("cy",300)
+        .attr("r",10)
+        .attr('fill','steelblue')
+
+
+    circle.transition()
+        .duration(2500)
+        .delay(1000)
+        .on("start", function repeat() {
+            d3.active(this)
+                .attr("cx", 500)
+                .attr("fill","orange")
+                .attr("r",50)
+                .transition()
+                .attr("cx", 100)
+                .attr("fill","steelblue")
+                .attr("r",10)
+                .transition()
+                .on("start", repeat);
+        });
+
+
+
+</script>
+
+</body>
+</html>

@@ -25,18 +25,24 @@
 
 
 function generate() {
-    for(let i=0;i<1000;i++)
-    {
+  const random_data = d3.range(0,1000,1).map(d=>(
+      {
+          x:d3.randomUniform()()*width,
+          y:d3.randomUniform()()*height,
+          r: d3.randomUniform()()*15,
+          color: d3.rgb(d3.randomUniform()()*255,d3.randomUniform()()*255,d3.randomUniform()()*255)
+      }))
 
-        svg.append('circle')
-            .attr('cx',d3.randomUniform()()*width)
-            .attr('cy',d3.randomUniform()()*height)
-            .attr('r',d3.randomUniform()()*15)
-            .attr('fill',function () {
-                return d3.rgb(d3.randomUniform()()*255,d3.randomUniform()()*255,d3.randomUniform()()*255)
-            })
+        svg.selectAll(".circle")
+            .data(random_data)
+            .enter()
+            .append('circle')
+            .attr('cx',d=>d.x)
+            .attr('cy',d=>d.y)
+            .attr('r',d=>d.r)
+            .attr('fill',d=>d.color)
             .attr('class','shapes')
-    }
+
 
 }
 
@@ -47,10 +53,10 @@ function generate() {
             .attr("fill", "green")
             .transition() // Then red.
             .duration(1000)
-            .style("fill", "red")
+            .attr("fill", "red")
             .transition() //  Remove 1 by 1
-            .delay( (_,i)=>i*10)
-            .style("fill", "brown")
+            .delay( (_,i)=>i)
+            .attr("fill", "black")
             .remove();
     })
 

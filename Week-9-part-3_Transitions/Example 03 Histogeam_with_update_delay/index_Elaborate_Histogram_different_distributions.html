@@ -67,7 +67,6 @@
             else{
                 lst_rnds.push(normal_random2())
             }
-
         }
         return lst_rnds
     }
@@ -92,7 +91,7 @@
         function make_scales()
         {
             // get min max of the array we want to calculate histogram
-            x_extent = d3.extent(data,function (d) { return d;});
+            x_extent = d3.extent(data,d=>d);
 
             // use number of bins to calculate the steps for thresholds used in binning
             // step 1: max of extent - min of extent --> range of x values
@@ -107,7 +106,7 @@
             let bin_function = d3.bin().thresholds(bins);
 
             // step 4 calculate the frequencies
-            let bin_Frequency_values = bin_function(d3.map(data,function (d) {return d;}));
+            let bin_Frequency_values = bin_function(d3.map(data,d=>d));
 
             // step 5 count the number of elements in each bin
             bin_Frequency = d3.map(bin_Frequency_values,function (d) {return d.length})
@@ -116,7 +115,7 @@
                 .domain(x_extent)
                 .range([0,fig_width]);
             yScale = d3.scaleLinear()
-                .domain([0,d3.max(bin_Frequency,function (d) {return d;})])
+                .domain([0,d3.max(bin_Frequency,d=>d)])
                 .range([fig_height,0]);
 
             // x and y Axis function
@@ -149,36 +148,29 @@
             .attr('y',function (d) {
                 return yScale(d); //fig_height-yScale(d)
             })
-            .attr('height',function (d) {
-                return fig_height-yScale(d);
-            })
+            .attr('height', d=>fig_height-yScale(d))
             .attr('fill','steelblue');
 
-        d3.select("#Normal").on("click", function()
+        d3.select("#Normal").on("click", ()=>
         {
             data = generate_randomNormal_data();
             updateData();
-
         });
-        d3.select("#Uniform").on("click", function()
+        d3.select("#Uniform").on("click", ()=>
         {
             data = generate_randomUniform_data();
             updateData();
-
         });
-        d3.select("#LogNormal").on("click", function()
+        d3.select("#LogNormal").on("click", ()=>
         {
             data = generate_randomLogNormal_data();
             updateData();
-
         });
-        d3.select("#MultiModal").on("click", function()
+        d3.select("#MultiModal").on("click", ()=>
         {
             data = generate_BiModal_data()
             updateData();
-
         });
-
         // Labels
         figure.append("g").attr("class","label")
             .attr("transform", `translate(${fig_width/2},${fig_height+margins/1.8})`)
@@ -190,7 +182,6 @@
             .append("text")
             .attr("class","label")
             .text(yLabel);
-
         /*
         Update data function is used to create another set of random numbers and update the histogram
          */
@@ -210,20 +201,15 @@
                 })
                 .ease(d3.easeBounceOut) // this bounce easing
             figure.selectAll("rect") // you can add styling here
-                .on("mouseover", function(d){
-                })
-                .on("mousemove", function(d){
-                })
-                .on("mouseout", function(d){
-                });
+                .on("mouseover", function(d){})
+                .on("mousemove", function(d){})
+                .on("mouseout", function(d){});
         }
         /*
         End of update data function
          */
-
         return {"bins":bins,"heights":bin_Frequency} // the function returns the number of bins and frequency (just like numpy.histogram())
     }
-
     data = generate_randomNormal_data()
     histogram(data,bin_number=50,fig_width=500, fig_height=300, margins=50)
 

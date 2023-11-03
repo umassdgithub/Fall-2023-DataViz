@@ -25,12 +25,11 @@
         .attr("r",10)
         .attr('fill','steelblue')
 
-
     circle.transition()
         .duration(2500)
         .delay(1000)
         .on("start", function repeat() {
-            console.log(d3.active(this))
+
             d3.active(this)
                 .attr("cx", 500)
                 .attr("fill","orange")

@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Histogram, Transition Delay</title>
+    <style>
+        body{
+            font-family: sans-serif;
+        }
+    </style>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
@@ -14,18 +19,15 @@
 <script>
 
     // step 1 get SVG element
-    let svg = d3.select("svg");
-    let width = window.innerWidth;
-    let height = window.innerHeight;
+    const svg = d3.select("svg");
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     let margins = 10;
 
     function generate_random_data(n=10000,mu=5,sigma = 3) {
-        let normal_random = d3.randomNormal(mu,sigma);
-        let lst_rnds = [];
-        for(let i=0;i<=n;i++){
-            lst_rnds.push(normal_random())
-        }
-        return lst_rnds
+        const normal_random = d3.randomNormal(mu,sigma);
+        //console.log(d3.range(0,n).map(d=>normal_random()))
+        return d3.range(0,n).map(d=>normal_random())
     }
 
     function histogram(data,bin_number=10,fig_width=100, fig_height=100, margins=10,xLabel='bins',yLabel ='Frequency') {

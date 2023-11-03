@@ -101,7 +101,8 @@
 
         // use limited number of rotations
         miniCircles.transition()
-            .duration(1000*60*3).ease(d3.easeLinear) //  the animation runs for 3 minutes!
+            .duration(1000*60*3)
+            .ease(d3.easeLinear) //  the animation runs for 3 minutes!
             .attrTween("transform",d=>
             {
                 let rndFactor = d3.randomInt(2,120)() //this is just to start planets motion from random location
