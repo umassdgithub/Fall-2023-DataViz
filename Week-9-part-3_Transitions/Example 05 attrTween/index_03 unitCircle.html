@@ -19,7 +19,7 @@
     marker
         .transition()
         .duration(10000)
-        .ease(d3.easeLinear) //  the animation runs for 3 minutes!
+        .ease(d3.easeBounceOut) //  the animation runs for 3 minutes!
         .attrTween("transform",function(d)
     {
     // this function at each time t=0 to 1, will return the value to transform the circle
