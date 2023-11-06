@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        svg{
+            width: 40vw;
+            height: 40vw;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/scatter_plot.js"></script>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+<div>
+    <svg viewBox="0 0 1000 1000" id="figure1">
+    </svg>
+    <svg viewBox="0 0 1000 1000" id="figure2">
+    </svg>
+</div>
+<div>
+    <svg viewBox="0 0 1000 1000" id="figure3">
+    </svg>
+    <svg viewBox="0 0 1000 1000" id="figure4">
+    </svg>
+</div>
+<script>
+
+    d3.tsv("./data/palmer_penguin_species.tsv")
+        .then(
+         data=>{
+
+            scatter_plot(
+                data=data,
+                "#figure1",
+                title="Pinguines",
+                xCol="culmen_length_mm",
+                yCol="body_mass_g",
+                rCol="culmen_depth_mm",
+                legend=[],
+                colorCol="species",
+                margin=150
+            )
+
+             scatter_plot(
+                 data=data,
+                 "#figure2",
+                 title="Pinguines",
+                 xCol="flipper_length_mm",
+                 yCol="body_mass_g",
+                 rCol="culmen_depth_mm",
+                 legend=[],
+                 colorCol="species",
+                 margin=150
+             )
+
+
+
+             scatter_plot(
+                 data=data,
+                 "#figure3",
+                 title="Pinguines",
+                 xCol="culmen_length_mm",
+                 yCol="culmen_depth_mm",
+                 rCol="culmen_depth_mm",
+                 legend=[],
+                 colorCol="species",
+                 margin=150
+             )
+
+             scatter_plot(
+                 data=data,
+                 "#figure4",
+                 title="Pinguines",
+                 xCol="flipper_length_mm",
+                 yCol="culmen_depth_mm",
+                 rCol="culmen_depth_mm",
+                 legend=[],
+                 colorCol="species",
+                 margin=150
+             )
+
+        }
+    )
+</script>
+</body>
+</html>

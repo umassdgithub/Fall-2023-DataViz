@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        svg{
+            width: 40vw;
+            height: 40vw;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/scatter_plot.js"></script>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+<div>
+    <svg viewBox="0 0 1000 1000" id="figure">
+    </svg>
+</div>
+<script>
+    //X : culmen_length_mm
+    //Y : culmen_depth_mm
+    //R : flipper_length_mm
+    //C : species
+
+    d3.tsv("./data/palmer_penguin_species.tsv")
+        .then(
+        function (data){
+            const species = ['Adelie','Gentoo','Chinstrap']
+            const classic_colors = [ "#440154", "#21908dff", "#fde725ff"]
+            const color = d3.scaleOrdinal()
+                .domain(species)
+                .range(classic_colors)
+
+            const formatted_data = d3.map(data, d=>({
+                    x: d.culmen_length_mm,
+                    y: d.culmen_depth_mm,
+                    r: d.flipper_length_mm,
+                    c: color(d.species)
+            }))
+
+            scatter_plot(formatted_data,"#figure",
+                title="Pinguines",
+                xLabel="culmen_length_mm",
+                yLabel="culmen_depth_mm",
+                legend=species,
+                legendcolors=classic_colors
+            )
+        }
+    )
+</script>
+</body>
+</html>

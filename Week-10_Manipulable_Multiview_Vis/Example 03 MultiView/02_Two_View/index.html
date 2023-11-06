@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        svg{
+            width: 40vw;
+            height: 40vw;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/scatter_plot.js"></script>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+<div>
+    <svg viewBox="0 0 1000 1000" id="figure1">
+    </svg>
+    <svg viewBox="0 0 1000 1000" id="figure2">
+    </svg>
+</div>
+<script>
+
+    d3.tsv("./data/palmer_penguin_species.tsv")
+        .then(
+        function (data){
+            let species = ['Adelie','Gentoo','Chinstrap']
+            let classic_colors = [ "#440154", "#21908dff", "#fde725ff"]
+            let color = d3.scaleOrdinal()
+                .domain(species)
+                .range(classic_colors)
+
+
+            let formatted_data1 = d3.map(data, (d)=>{
+                return {
+                    x: d.culmen_length_mm,
+                    y: d.culmen_depth_mm,
+                    r: d.flipper_length_mm,
+                    c: color(d.species)
+                }
+            })
+
+
+
+            let formatted_data2 = d3.map(data, (d)=>{
+                return {
+                    x: d.culmen_length_mm,
+                    y: d.body_mass_g,
+                    r: d.flipper_length_mm,
+                    c: color(d.species)
+                }
+            })
+
+
+            scatter_plot(formatted_data1,"#figure1",
+                title="Pinguines _1",
+                xLabel="culmen_length_mm",
+                yLabel="body_mass_g",
+                legend=species,
+                legendcolors=classic_colors,
+                margin=200
+            )
+
+            scatter_plot(formatted_data2,"#figure2",
+                title="Pinguines _2",
+                xLabel="culmen_length_mm",
+                yLabel="flipper_length_mm",
+                legend=species,
+                legendcolors=classic_colors,
+                margin=200
+            )
+        }
+    )
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>Slider update date</title>
+    <style>
+        body{
+            font-size: 14pt;
+            font-family: sans-serif;
+        }
+        input{
+            width: 30%;
+        }
+        svg{
+            width: 30vw;
+            height: 30vw;
+            border: gold 2px dashed;
+        }
+        circle{
+            fill-opacity: .5;
+        }
+        #control{
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+        }
+        #visualization{
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div id="control">
+    <label for="theSlider">count to show
+    </label>
+    <input type="range" value="40" min="1" max="40" id="theSlider">
+</div>
+<div id="visualization">
+<svg viewBox="0 0 400 400"></svg>
+</div>
+<script>
+// select svg
+let svg = d3.select("svg")
+let rnd = d3.randomUniform()
+let data = d3.map(d3.range(0,40),
+     ()=>{
+    return {x: parseInt(300*rnd()+10),
+            y:parseInt(300*rnd()+10),
+            r:parseInt(10*rnd()+10),
+            c:d3.rgb(parseInt(255*rnd()),parseInt(255*rnd()),parseInt(255*rnd()))
+    }
+})
+
+function update(data){
+    let circles =svg.selectAll('circle').data(data) // assign data
+    circles.exit().remove();//remove unneeded circles
+    circles.enter().append('circle') //append new circles
+        .attr('cx', d=>d.x)
+        .attr('cy',d=> d.y)
+        .transition()
+        .duration(1000)
+        .ease(d3.easeBounceOut)
+        .attr('r',d=> d.r)
+        .attr('fill',d=> d.c)
+
+}
+// initial run the update function
+update(data)
+// add event handler to the slider
+let slider = document.querySelector("#theSlider")
+slider.addEventListener("change",()=>{
+    const count = +slider.value; // get the value of the slider
+    console.log(count)
+    const filtered_data = d3.filter(data, (_,i)=>i<count)
+    update(filtered_data);
+})
+
+
+
+
+</script>
+</body>
+</html>

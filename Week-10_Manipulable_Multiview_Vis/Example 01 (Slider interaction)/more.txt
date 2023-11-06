@@ -1,0 +1,19 @@
+
+<!--
+do you need cute sliders? https://refreshless.com/nouislider/
+In <head>
+<link href="nouislider.min.css" rel="stylesheet">
+----------------------------------------------------------------
+In <body>
+<script src="nouislider.min.js"></script>
+var slider = document.getElementById('slider');
+----------------------------------------------------------------
+in JS
+noUiSlider.create(slider, {
+    start: [20, 80],
+    connect: true,
+    range: {
+        'min': 0,
+        'max': 100
+    }
+});

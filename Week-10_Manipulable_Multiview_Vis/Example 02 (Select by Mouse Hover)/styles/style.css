@@ -1,0 +1,25 @@
+.axisX{
+    font-size: 30pt;
+}
+.axisY{
+    font-size: 30pt;
+}
+.axis{
+    font-size: 30pt;
+}
+circle{
+    fill-opacity: .7;
+}
+.title{
+    font-size: 50pt;
+    font-family: sans-serif;
+    text-anchor: middle;
+}
+.label{
+    font-size: 30pt;
+    font-family: sans-serif;
+    text-anchor: middle;
+}
+.bars{
+    fill-opacity: .7;
+}
