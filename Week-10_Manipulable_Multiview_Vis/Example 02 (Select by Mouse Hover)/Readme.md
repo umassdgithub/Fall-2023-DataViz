@@ -18,7 +18,7 @@
 
 ## the scatter_plot function
 ### The scatter_plot function in js folder
-
+```
 const scatter_plot=(data,
 ax,                   // the host DOM element
 title="",      // Title of the visualization
@@ -30,6 +30,7 @@ margin = 100)=>
 const xScale= d3.scaleLinear().domain(d3.extent(data, d=>d.x))
 .range([margin,1000-margin])
 // data scale for the yAxis
+```
 
 ```    
 const yScale= d3.scaleLinear().domain(d3.extent(data, d=> d.y))
