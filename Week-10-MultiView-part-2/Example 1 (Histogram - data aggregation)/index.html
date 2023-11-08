@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Histogram</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="../lib/d3.js"></script>
+    <link rel="stylesheet" href="../styles/style.css">
+
+</head>
+<body>
+<div id="title">Normal Distribution</div>
+<div id="fig"></div>
+<div class="container">
+<div id="control" class="form-group">
+    <label for="bins"  class="form-label">Number of Bins:<div id="binNumber"></div> </label>
+    <input id=bins type="range" min="2" max="50" value="10" step="1" class="rngSlider form-control form-range">
+    <label for="mu" class="form-label">Value of mu (μ) <div id="muNumber"></div></label>
+    <input id="mu" type="range" min="-20" max="20" value="5" step="0.1" class="rngSlider form-control form-range">
+    <label for="sigma"  class="form-label">Value of Sigma (σ) <div id="sigmaNumber"></div></label>
+    <input id="sigma" type="range" min=".01" max="5" value=".1" step="0.1" class="rngSlider form-control form-range">
+</div>
+</div>
+<script>
+
+    let svg = d3.select("#fig")
+        .append("svg")
+        .attr("width","90vw")
+        .attr("height","400px").style("background-color","#f5f5f5")
+        .attr("viewBox",[0,0,1200,800])
+
+
+    function BarChart(svg,binNumber=10,mu=0,sigma = .1) {
+        const fig_size = {
+            height : 500,
+            width: 1000
+        }
+        const margin = 100
+        // random function (normal distribution)
+        // refer to https://observablehq.com/@d3/d3-random
+        // for other available distributions
+
+        let rndNormal= d3.randomNormal(mu,sigma)
+        // Sample data (1000 points)
+        let sample = d3.range(1000).map(d=>rndNormal())
+        //find median and mean
+        let median = d3.median(sample)
+        let mean = d3.mean(sample)
+
+
+        let hist = d3.histogram()
+            .domain(d3.extent(sample,d=>d))
+            .value(d=>d)
+            .thresholds(binNumber)
+        let bins = hist(sample)
+        const formatter = d3.format(",.2f")
+        let data = bins.map((d, i) => {
+            return {
+                key: `${formatter(d['x0'])}-${formatter(d['x1'])}`,
+                value: d['length']
+            }
+        })
+
+        const yScale = d3.scaleLinear()
+            .range([fig_size.height, 0])
+        const xScale = d3.scaleBand()
+            .rangeRound([0, fig_size.width])
+            .paddingInner(0.2)
+
+
+        svg.selectAll('*').remove()
+        let figure = svg.append("g")
+            .attr("transform", `translate(${margin},${margin})`)
+
+        xScale.domain(d3.range(data.length))
+
+
+
+        //yScale.domain([0, d3.max(data, d => d.value)])
+        yScale.domain([0, 500])
+        figure.selectAll(".bars")
+            .data(data)
+            .enter()
+            .append('rect')
+            .attr("class","bars")
+            .attr('y', d => yScale(d.value))
+            .attr('x', (d, i) => xScale(i))
+            .attr('width', xScale.bandwidth())
+            .attr('height', d => fig_size.height - yScale(d.value))
+            .attr("fill", "#343a40")
+        const xAxis = svg.append("g")
+            .attr("transform", `translate(${margin},${fig_size.height + margin})`)
+            .attr("class", "xAxis")
+            .call(d3.axisBottom(xScale)
+                .tickFormat((d, i) => data[i].key)
+            ).selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
+        const yAxis = svg.append("g")
+            .attr("transform", `translate(${margin},${margin})`)
+            .attr("class", "yAxis")
+            .call(d3.axisLeft(yScale))
+
+       let stat = figure.append('g').attr("transform",`translate(${100},${0})`)
+        stat.append("text")
+           .attr("class","stat")
+           .text(`Median: ${formatter(median)}`)
+       stat.append("text")
+           .attr("y",35)
+           .attr("class","stat")
+           .text(`Mean: ${formatter(mean)}`)
+
+
+
+    }
+    BarChart(svg)
+
+
+/// control
+ d3.selectAll(".rngSlider").on("input",function(d){
+        BarChart(svg,
+            d3.select("#bins")._groups[0][0]['value'],
+            d3.select("#mu")._groups[0][0]['value'],
+            d3.select("#sigma")._groups[0][0]['value']
+        )
+    })
+
+
+</script>
+</body>
+</html>

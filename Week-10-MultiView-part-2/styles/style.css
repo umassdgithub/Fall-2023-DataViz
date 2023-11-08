@@ -1,0 +1,48 @@
+#title{
+    display: block;
+    margin: 10px auto;
+    text-align: center;
+    width: 90vw;
+    font-family: sans-serif;
+    font-size: 20pt;
+    color: #808080;
+}
+#fig{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    width: 90vw;
+}
+.xAxis{
+    font-family: sans-serif;
+    font-size: 20pt;
+}
+.yAxis{
+    font-family: sans-serif;
+    font-size: 20pt;
+}
+
+.axis{
+    font-size: 30pt;
+}
+.bars{
+    fill-opacity: .7;
+
+}
+:hover.bars{
+    fill-opacity: .9;
+    fill: darkred;
+}
+.stat{
+    font-family: sans-serif;
+    font-size: 25pt;
+}
+text.label{
+ font-family: sans-serif;
+ font-size: 32pt;
+}
+text.plotTitle{
+    font-family: sans-serif;
+    font-size: 32pt;
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../lib/d3.js"></script>
+    <script src="bar_plot.js"></script>
+</head>
+<body>
+<svg id="top" width="800px" height="600px"></svg>
+<svg id="right" width="800px" height="600px"></svg>
+
+
+<script>
+    // data file url
+    let palmer_penguin_species = "../data/palmer_penguin_species.tsv";
+    // loading data using d3.tsv
+    d3.tsv(palmer_penguin_species).then(main)
+    function main(data){
+
+        // fetch data from table
+        let culmen_length_mm = d3.map(data,function (d){
+            return +d.culmen_length_mm})
+        let culmen_depth_mm = d3.map(data,function (d){
+            return +d.culmen_depth_mm})
+        let flipper_length_mm = d3.map(data,function (d){
+            return +d.flipper_length_mm})
+        let species = d3.map(data,function (d){
+            return d.species})
+        let species_types = new Set(species)
+
+        bar_plot(culmen_depth_mm, 10,'top')
+        h_bar_plot(culmen_length_mm,10,'right')
+    }
+
+</script>
+</body>
+</html>

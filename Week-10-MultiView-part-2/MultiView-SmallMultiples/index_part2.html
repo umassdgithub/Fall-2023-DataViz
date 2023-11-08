@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Covid-19 Cases per 100k</title>
+    <script src="lib/d3.js"></script>
+    <script src='https://unpkg.com/simple-statistics@7.7.0/dist/simple-statistics.min.js'></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <style>
+        #toolTipSvg{
+            width: 250px;
+            height: 150px;
+        }
+        #mapSvg{
+            width: 90vw;
+            height: 90vh;
+        }
+        .title{
+            font-family: sans-serif;
+            font-size: 70pt;
+        }
+        #tooltip{
+            width: 250px;
+            height: 150px;
+            position: absolute;
+            opacity: 1;
+
+        }
+    </style>
+</head>
+<body>
+<div id="tooltip"></div>
+<script>
+
+    // define the sizes and the margins
+    const margins = {top: 100,  right:100, bottom:100, left:100 }
+    const svgSize ={width: 1200, height:1000  }
+    const svg = d3.select("#tooltip")
+        .append("svg")
+        .attr("id","toolTipSvg")
+        .attr("viewBox", [0, 0 , svgSize.width, svgSize.height]);
+    const canvas = svg.append("g").attr("class","canvas")
+
+
+    Promise.all([
+        d3.json("https://raw.githubusercontent.com/umassdgithub/Sample_Data/main/cb_2018_us_state_20m_topo.json"),
+        d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv",
+            d=>{
+                return{
+                    date : new Date(d.date),
+                    cases_avg: Number(d.cases_avg_per_100k),
+                    deaths_avg: Number(d.deaths_avg_per_100k),
+                    state: d.state}})
+            ])
+        .then(loaded_data=>
+        {
+            let topoData =  loaded_data[0];
+            let data = loaded_data[1];
+            const states = [...new Set(data.map(d=>d.state))]
+
+            function addMap(topoData,data)
+            {
+                function getLastDateDeaths(data,state="Washington")
+                {
+                    return data.filter(d=>d['state']===state).slice(-1)[0].deaths_avg
+                }
+
+                let deaths = []
+                states.forEach(d=>{
+                    deaths.push(getLastDateDeaths(data,d))
+                })
+                const colorScale = d3.scaleSequential()
+                    .interpolator(d3.interpolateOrRd)
+                    .domain(d3.extent(deaths,d=>d))
+                const mapMargins = {top: 100,  right:100, bottom:100, left:100 }
+                const mapSvgSize ={width: 1200, height:1000}
+                const geojson =topojson.feature(topoData,topoData.objects.cb_2018_us_state_20m)
+                const projection = d3.geoAlbersUsa().fitSize([mapSvgSize.width,mapSvgSize.height],geojson)
+                const geoPath = d3.geoPath().projection(projection)
+
+
+                let mapSvg = d3.select("body")
+                    .append("svg")
+                    .attr("id","mapSvg")
+                    .attr("viewBox",[0,0,mapSvgSize.width,mapSvgSize.height])
+
+                const stateLineCharts = new Map();
+
+                states.forEach(state => {
+                    const stateData = state_data(data, state);
+                    const stateLine = CasesLineGenerator(stateData.sateData);
+                    const color = stateData.slope <= 0 ? "green" : "red";
+                    stateLineCharts.set(state, { line: stateLine, color });
+                });
+
+                mapSvg.selectAll('.path')
+                    .data(geojson.features)
+                    .enter()
+                    .append("path")
+                    .attr("d",d=>geoPath(d))
+                    .attr("fill",d=>{
+                        return colorScale(getLastDateDeaths(data,d.properties.NAME))
+                    })
+                    .attr("stroke","none")
+                    .on("mouseenter", (m, d) => {
+                        const state = d.properties.NAME;
+                        const { line, color } = stateLineCharts.get(state);
+                        lineChart(canvas, line, state, color);
+                        d3.select("#tooltip")
+                            .style("top", (m.clientY - 100) + "px")
+                            .style("left", (m.clientX - 200) + "px")
+                            .style("opacity", 1);
+                    })
+                    .on("mouseleave", () => {
+                        // Hide the tooltip on mouse leave
+                        d3.select("#tooltip").style("opacity", 0);
+                    });
+
+        }
+
+            addMap(topoData,data)
+
+
+
+            ///////////////////////////////////////////////
+
+
+
+        function lineChart(canvas,data,Title,lineColor="green"){
+            canvas.selectAll('*').remove()
+            canvas.append("text")
+                .attr("class","title")
+                .attr("x",(svgSize.width-margins.left-margins.right)/2)
+                .attr("y",margins.top)
+                .attr("text-anchor","middle")
+                .text(Title)
+            canvas.append("path")
+                .attr("d",data)
+                .attr("fill","None")
+                .attr("stroke",lineColor)
+                .attr("stroke-width","8")
+        }
+
+      function plotLineChart(state)
+      {
+            // get one state data
+            let state_data_filtered = state_data(data,state);
+
+            const oneState = CasesLineGenerator(state_data_filtered.sateData)
+
+            if(state_data_filtered.slope<=0){
+                lineChart(canvas,oneState,state,"green")
+            }
+            else{
+                lineChart(canvas,oneState,state,"red")
+                }
+            }
+
+
+
+
+
+
+
+    })
+</script>
+</body>
+</html>

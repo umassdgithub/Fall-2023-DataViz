@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="lib/d3.js"></script>
+    <script src='https://unpkg.com/simple-statistics@7.7.0/dist/simple-statistics.min.js'>
+    </script>
+    <style>
+        svg{
+            width: 20vw;
+            height: 20vh;
+        }
+        .title{
+            font-family: sans-serif;
+            font-size: 70pt;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    d3.csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/rolling-averages/us-states.csv",
+    d=>{
+        return{
+            date : new Date(d.date),
+            cases_avg: Number(d.cases_avg_per_100k),
+            deaths_avg: Number(d.deaths_avg_per_100k),
+            state: d.state
+        }
+    }
+    ).then(data=>{
+
+        const states = [...new Set(data.map(d=>d.state))]
+        function state_data(dataset,stateName="Washington"){
+            let st = dataset.filter(d=>d.state===stateName)
+            let slope = ss.linearRegression(st.slice(-10).map((d,i)=>[i,d.cases_avg])).m
+            return {sateData: st, slope:slope};
+        }
+
+        // define the sizes and the margins
+        const margins = {top: 100,  right:100, bottom:100, left:100 }
+        const svgSize ={width: 1200, height:1000  }
+
+        const xScale = d3.scaleTime()
+            .domain(d3.extent(data,d=>d.date))
+            .range([margins.left,svgSize.width-margins.right])
+
+        const yScale = d3.scaleLinear()
+            .domain(d3.extent(data,d=>d.cases_avg))
+            .range([svgSize.height-margins.bottom,margins.top])
+        const CasesLineGenerator = d3.line().x(d=>xScale(d.date)).y(d=>yScale(d.cases_avg))
+
+
+        function lineChart(canvas,data,Title,lineColor="green"){
+            canvas.append("text")
+                .attr("class","title")
+                .attr("x",(svgSize.width-margins.left-margins.right)/2)
+                .attr("y",margins.top)
+                .attr("text-anchor","middle")
+                .text(Title)
+            canvas.append("path")
+                .attr("d",data)
+                .attr("fill","None")
+                .attr("stroke",lineColor)
+                .attr("stroke-width","3")
+        }
+
+        states.forEach(d=>{
+            // get one state data
+            let state_data_filtered = state_data(data,d);
+            console.log(state_data_filtered.slope)
+            const oneState = CasesLineGenerator(state_data_filtered.sateData)
+
+            const svg = d3.select("body")
+                .append("svg")
+                .attr("viewBox", [0, 0 , svgSize.width, svgSize.height]);
+            const canvas = svg.append("g").attr("class","canvas")
+            if(state_data_filtered.slope<=0){
+                lineChart(canvas,oneState,d,"green")
+            }
+            else{
+                lineChart(canvas,oneState,d,"red")
+            }
+
+            }
+
+        )
+
+
+
+
+
+
+
+    })
+</script>
+</body>
+</html>

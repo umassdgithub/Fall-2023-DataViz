@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>joint plot</title>
+
+    <script src="scatter_plot.js?2"></script>
+    <script src="bar_plot.js?2"></script>
+
+    <link rel="stylesheet" href="../styles/style.css">
+    <style>
+        .fig{
+            fill: #faf8f8;
+        }
+        table{
+            border: 1px solid #d2bcbc;
+            border-collapse: collapse;
+            width: 60vw;
+        }
+        td{
+            border: 1px solid #d2bcbc;
+            border-collapse: collapse;
+            padding: 10px;
+            width: 10vw;
+        }
+    </style>
+    <script src="../lib/d3.js"></script>
+
+
+</head>
+<body>
+
+<!-- https://seaborn.pydata.org/generated/seaborn.jointplot.html -->
+<!--palmer_penguin_species: https://raw.githubusercontent.com/datavizpyr/data/master/palmer_penguin_species.tsv -->
+<table>
+    <tr>
+        <td><svg width="500px" height="150px"  id="top"></svg></td>
+        <td width="10%">&nbsp</td>
+    </tr>
+    <tr>
+        <td><svg width="500px" height="500px" viewBox="0 0 1000 1000" id="main"></svg></td>
+        <td><svg width="150px" height="500px" id="right"></svg></td>
+    </tr>
+</table>
+
+<script>
+    let palmer_penguin_species = "../data/palmer_penguin_species.tsv";
+    // loading data
+    d3.tsv(palmer_penguin_species).then(main)
+
+    // Subplots
+    let fig_main = d3.select("#main")
+        .append("g")
+        .append('rect')
+        .attr("class","fig")
+        .attr("width","100%")
+        .attr("height","100%")
+    // top svg
+    let fig_top = d3.select("#top")
+        .append("g")
+        .append('rect')
+        .attr("class","fig")
+        .attr("width","100%")
+        .attr("height","100%")
+    // right svg
+    let fig_right = d3.select("#right")
+        .append("g")
+        .append('rect')
+        .attr("class","fig")
+        .attr("width","100%")
+        .attr("height","100%")
+
+    function main(data){
+        // fetch data from table
+        let culmen_length_mm = d3.map(data,function (d){
+            return +d.culmen_length_mm})
+        let culmen_depth_mm = d3.map(data,function (d){
+            return +d.culmen_depth_mm})
+        let flipper_length_mm = d3.map(data,function (d){
+            return +d.flipper_length_mm})
+        let species = d3.map(data,function (d){
+            return d.species})
+        let species_types = new Set(species)
+
+        let species_code = d3.map(data,function (d) {
+            species = d.species
+            if (species === "Adelie") {
+                return 0
+            } else if (species === "Gentoo") {
+                return 1
+            } else {
+                return 2
+            }
+        })
+
+        // main svg
+        scatter_plot(culmen_depth_mm,
+            culmen_length_mm,
+            10,
+            species_code,
+            'main'
+            ,title='Penguin Species',
+            xLabel="culmen_depth_mm",
+            yLabel="culmen_length_mm");
+        //#############
+        bar_plot(culmen_depth_mm, 10,'top')
+        h_bar_plot(culmen_length_mm,10,'right')
+
+    }
+</script>
+
+</body>
+</html>

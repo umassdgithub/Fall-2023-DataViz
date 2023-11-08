@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>joint plot</title>
+    <script src="../lib/d3.js"></script>
+    <script src="scatter_plot.js?1"></script>
+
+    <link rel="stylesheet" href="../styles/style.css?1">
+    <style>
+        .fig{
+            fill: #faf8f8;
+        }
+        table{
+            border: 0px solid #ffffff;
+            border-collapse: collapse;
+        }
+        .highlighted{
+            fill: red ;
+            fill-opacity: 1;
+            stroke-width: 5;
+            stroke: black;
+        }
+    </style>
+
+
+
+</head>
+<body>
+
+<!-- https://seaborn.pydata.org/generated/seaborn.jointplot.html -->
+<!--palmer_penguin_species: https://raw.githubusercontent.com/datavizpyr/data/master/palmer_penguin_species.tsv -->
+
+<svg width="500px" height="500px" viewBox="0 0 1000 1000" id="left"></svg>
+<svg width="500px" height="500px" viewBox="0 0 1000 1000" id="right"></svg>
+
+
+<script>
+    let palmer_penguin_species = "../data/palmer_penguin_species.tsv";
+    // loading data
+    d3.tsv(palmer_penguin_species).then(main)
+
+
+    function main(data){
+        // fetch data from table
+        let culmen_length_mm = d3.map(data,function (d){
+            return +d.culmen_length_mm})
+        let culmen_depth_mm = d3.map(data,function (d){
+            return +d.culmen_depth_mm})
+        let flipper_length_mm = d3.map(data,function (d){
+            return +d.flipper_length_mm})
+        let species = d3.map(data,function (d){
+            return d.species})
+        let gender = d3.map(data,function (d){
+            return d.gender})
+        let species_types = new Set(species)
+
+        let species_code = d3.map(data,function (d) {
+            species = d.species
+            if (species === "Adelie") {
+                return 0
+            } else if (species === "Gentoo") {
+                return 1
+            } else {
+                return 2
+            }
+        })
+
+        let gender_code = d3.map(data,function (d) {
+            gender = d.gender
+            if (gender === "MALE") {
+                return 0
+            } else if (gender === "FEMALE") {
+                return 1
+            } else {
+                return 2
+            }
+        })
+
+        // left svg
+        scatter_plot(culmen_depth_mm,
+            culmen_length_mm,
+            10,
+            species_code,
+            'left'
+            ,title='Penguin Species',
+            xLabel="culmen_depth_mm",
+            yLabel="culmen_length_mm");
+        // right svg
+        scatter_plot(flipper_length_mm,
+            culmen_length_mm,
+            10,
+            gender_code,
+            'right'
+            ,title='Penguin Gender',
+            xLabel="flipper_length_mm",
+            yLabel="culmen_length_mm");
+
+        // interaction
+
+
+
+    }
+</script>
+
+</body>
+</html>
