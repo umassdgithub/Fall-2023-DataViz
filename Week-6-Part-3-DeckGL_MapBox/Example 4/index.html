@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Covid-19 Visualization</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <!--Deckgl and MapBox requirements -->
+    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="tokens.js"></script>
+    <style>
+        div #container{
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<div class="container"><div id="container"></div></div>
+</body>
+<script>
+    const data_url = "https://raw.githubusercontent.com/umassdgithub/Sample_Data/main/covid_19_Oct6_2020_.geojson"
+    // Mapbox token already added as an external file
+    //for color mapping
+    d3.json(data_url).then(function (data){
+    //let us make the color scale function for the cases
+        // get min max
+        let cases_min_max = d3.extent(data.features,function (d){
+            return d.properties.cases
+        })
+        let color_scale=function (d){
+            let cases = d.properties.cases
+            if(typeof(cases)==="number"){
+                let color=d3.scaleLinear()// it has to receive none-zero values as domain
+                            .domain([cases_min_max[0]+1,cases_min_max[1]])
+                            .range(["pink","red"])
+                            .interpolate(d3.interpolateCubehelix.gamma(.4))
+                // we need the rgb value
+                let rgb = d3.rgb(color(cases+1))
+                return [rgb.r,rgb.g,rgb.b];
+            }
+            else {return [0,0,0]}
+        }
+
+    const {DeckGL, GeoJsonLayer} =deck;
+    // declGl class
+    //Layers
+    // Now we need to read data from a url
+    // for this example I use the covid-19 data we had before:
+
+    // let us make a geoJson Layer
+    const my_covid_19_layer = new GeoJsonLayer({
+        data : data,
+        opacity: .8,
+        stroked: true,
+        filled: true,
+        extruded: true, // for 3d
+        wireframe: true,
+        elevationScale: 4,
+        getElevation: function (d){
+        if (d['properties'].cases!=undefined){
+            return d['properties'].cases;
+        }
+        },
+        lineWidthScale: .5,
+        lineWidthMinPixels: .5,
+        getFillColor: function (d){return color_scale(d)},
+        getLineColor: [255,255,255],
+
+    })
+    //deckgl map
+    new DeckGL({
+        container:"container",
+        mapboxApiAccessToken:token,
+        controller:true,
+
+        mapStyle:'mapbox://styles/mapbox/streets-v11',
+        initialViewState:{
+            pitch:30,
+            longitude: -90,
+            latitude: 37,
+            zoom:4,
+            maxZoom:14,
+        },
+        glOptions:{stencil: true},
+        // layers import all the layers to be displayed
+        layers: [my_covid_19_layer],
+    });
+
+    });
+
+</script>
+
+
+
+</html>

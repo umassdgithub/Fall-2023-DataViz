@@ -1,0 +1,105 @@
+<html>
+<head>
+    <title>Base minimum DeckGL Choropleth</title>
+
+    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script src="token.js"></script>
+
+    <style>
+        #container {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+</body>
+<script type="text/javascript">
+    const {DeckGL, GeoJsonLayer, GreatCircleLayer,ColumnLayer,OrthographicView,GridCellLayer} = deck;
+
+    // Load the MASS data from the geojson
+    d3.json("https://raw.githubusercontent.com/umassdgithub/Sample_Data/main/MA_GeoJSON.json").then(
+        data=>{
+        // initiate a geoPath Generator
+        const d3Generator = d3.geoPath();
+        // use the geoPath generator to find the center of the towns
+        // convert the data to more readable format by deckGL
+        const feats = data.features.map(d=>({"centroid": d3Generator.centroid(d),value:d.properties}));
+
+
+        // find the min max value for the population in 2010
+        const POP2010_domain = d3.extent(feats.map(d=>d.value.POP2010));
+        // define one of the many d3js color scales
+        const colorInterpolator = d3.interpolateTurbo;
+        // initiate a linear scale to scale data between 0 and 1 for the min and max population
+        const populationScale = d3.scaleLinear().domain(POP2010_domain);
+
+        // first layer is the geojson layer with the boundaries of the towns
+        const geojsonLayer = new GeoJsonLayer({
+            data: data,
+            stroked: true,
+            filled: false,
+            opacity:1,
+            getLineColor: [0, 0, 0],
+            getLineWidth: 3,
+            lineWidthMinPixels: .5
+    })
+    // now we want to add one column for each one of the counties, with thematic value of the population in 2010
+    const columnLayer = new GridCellLayer({
+        id: 'population_in_2010',
+        data:feats,                     // pass the formatted data for the features to the columnLayer
+        diskResolution: 100,            // set the resolution of the bars
+        radius: 1300,                   // set the radius of each bar
+        //extruded: true,
+        pickable: true,
+        elevationScale: .2,     // adjust this number for get reasonable bar sizes
+        getPosition: d => {
+
+            return d.centroid
+        },
+        getFillColor: d => {        // calculate the fill color
+            // use the populationScale to normalize the population between 0 - 1
+            // use colorInterpolator to interpolate the values  between 0 - 1 to a color
+            // use d3.rgb to convert the values to RGB
+            const color = d3.rgb(colorInterpolator(populationScale( d.value.POP2010)))
+            return [color.r, color.g, color.b, 250] // Pass the RGB to the deckGl generator
+        },
+        getLineColor: [0, 0, 0],
+        getElevation: d => d.value.POP2010      // the value of the population in used for elevation of the bars
+    });
+
+
+
+    // http://bboxfinder.com/
+    // mass bbox center : -71.961823,42.182741
+    new DeckGL({
+        mapboxApiAccessToken:token,
+        mapStyle:'mapbox://styles/mapbox/streets-v11',
+        container: "container",
+        initialViewState: {
+            pitch:30,               // tilt map by 30 degrees
+            latitude: 42.182741,    // center of the map in the view
+            longitude: -71.961823,
+            zoom: 7,                // zoom level
+            maxZoom: 16             // max zoom
+        },
+        controller: true,                   // Enable controllers for zoom and pan
+        layers: [geojsonLayer,columnLayer] // pass the generated deckGL layers to DeckGL engine
+    });
+
+
+    }
+    )
+
+
+
+</script>
+</html>

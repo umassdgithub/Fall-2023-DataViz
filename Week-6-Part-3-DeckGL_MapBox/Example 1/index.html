@@ -1,0 +1,63 @@
+<html>
+<head>
+    <title>Base minimum DeckGL Choropleth</title>
+
+    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script src="token.js"></script>
+
+    <style>
+        #container {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+</body>
+<script type="text/javascript">
+    const {DeckGL, GeoJsonLayer} = deck;
+    const geojsonLayer = new GeoJsonLayer({
+        data: 'https://raw.githubusercontent.com/umassdgithub/Sample_Data/main/MA_GeoJSON.json',
+        stroked: true,
+        filled: true,
+        opacity:.9,
+        getLineColor: [0, 0, 0],
+        lineWidthMinPixels: .5,
+        getFillColor: d=> color(d['properties']['POP2010']),
+    });
+    // http://bboxfinder.com/
+    // mass bbox center : -71.961823,42.182741
+    new DeckGL({
+        mapboxApiAccessToken:token,
+        mapStyle:'mapbox://styles/mapbox/streets-v11',
+        container: "container",
+        initialViewState: {
+            latitude: 42.182741,
+            longitude: -71.961823,
+            zoom: 7,
+            maxZoom: 16
+        },
+        controller: true,
+        layers: [geojsonLayer]
+    });
+
+    function color(population, min=75, max=617594){
+        let colorInterpolator = d3.interpolateRgbBasis(["blue", "steelblue", "green", "purple", "red"])
+        let logScale = d3.scaleLog()
+            .domain([min,max])
+        let hexColor = colorInterpolator(logScale(population))
+        let rgbColor = d3.rgb(hexColor)
+        return [rgbColor.r,rgbColor.g,rgbColor.b];
+    }
+
+
+</script>
+</html>
