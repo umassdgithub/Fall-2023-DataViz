@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Glyph</title>
+    <script src="../bin/d3.js"></script>
+</head>
+<body>
+<svg viewBox="0 0 1000 800" width="100vw" height="100vh">
+</svg>
+<script>
+    function glyphGen(container,dimension,rotation,color,glyphLen=3){
+        const glyph_shape = d3.symbol()
+            .type(d3.symbolTriangle)
+            .size(dimension);
+        console.log(glyph_shape())
+       const glyph = container.append("g")
+           .attr("transform", `rotate(${rotation*360},0,0)`)
+           .selectAll('.Gl')
+            .data(d3.range(glyphLen))
+            .join("g")
+            .attr("transform",d=>`translate(${d*7},0) rotate(90)`)
+            .append("path")
+            .attr("d",glyph_shape)
+           .attr("fill",color)
+           .attr("fill-opacity",0.8)
+    }
+
+
+
+    const svg = d3.select("svg")
+
+    function arrowGlyph(container,x,y,length,scale,rotation,color){
+        const miniGlyph= d3.path();
+        miniGlyph.moveTo(0, 5);
+        miniGlyph.lineTo(length-8, 5);
+        miniGlyph.lineTo(length-8, 0);
+        miniGlyph.lineTo(length, 8);
+        miniGlyph.lineTo(length-8, 15);
+        miniGlyph.lineTo(length-8, 10);
+        miniGlyph.lineTo(length-8, 10);
+        miniGlyph.lineTo(0, 10);
+        miniGlyph.closePath();
+        container
+            .append("g")
+            .attr("transform",`translate(${x},${y}) scale(${scale}) rotate(${rotation * 360},0,0)`)
+            .append("path")
+            .attr("d",miniGlyph)
+            .attr("fill",color)
+    }
+    arrowGlyph(svg,100,100,50,5,0,"black")
+
+</script>
+
+
+</body>
+</html>

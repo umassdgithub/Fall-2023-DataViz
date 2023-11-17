@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Animated Glyph</title>
+    <script src="../bin/d3.js"></script>
+</head>
+<body>
+<svg viewBox="0 0 1000 800" width="100vw" height="100vh">
+</svg>
+<script>
+    function glyphGen(container,dimension,rotation,color,glyphLen=3){
+        const glyph_shape = d3.symbol()
+            .type(d3.symbolTriangle)
+            .size(dimension);
+       const glyph = container.append("g")
+           .attr("transform", `rotate(${rotation*360},0,0)`)
+           .selectAll('.Gl')
+            .data(d3.range(glyphLen))
+            .join("g")
+            .attr("transform",d=>`translate(${d*7},0) rotate(90)`)
+            .append("path")
+            .attr("d",glyph_shape)
+           .attr("fill","none")
+           .transition()
+           .duration(dimension*100)
+           .attr("fill","steelblue")
+           .on("end",function redo(){
+               d3.active(this)
+                   .transition()
+                   .delay(d=>d*10)
+                   .attr("fill",color)
+                   .attr("fill-opacity",0.3)
+                   .transition()
+                   .attr("fill",color)
+                   .attr("fill-opacity",0.8)
+                   .on("end", redo);
+           })
+    }
+    function reshapeArray(arr,m){
+        const temporaryArr = []
+        while(arr.length) temporaryArr.push(arr.splice(0,m));
+        return temporaryArr
+    }
+
+    const margin = 50;
+    const width = 1000
+    const height = 700
+
+    d3.json("../data/windData.json")
+        .then(data=>{
+        const base = d3.select("svg")
+        const lonData = data['lon'];
+        const latData = data['lat'];
+        let wind_speed = data['wind_speed'].map(d=>+d)
+        const windSpeedScale =  d3.scaleLinear().domain(d3.extent(wind_speed)).range([1,4])
+        const speedColorScale = d3.scaleLinear().domain(d3.extent(wind_speed)).range(["steelblue","red"])
+        let  wind_direction = data['wind_direction'].map(d=>+d)
+            wind_direction = reshapeArray(wind_direction,lonData.length)
+            wind_speed = reshapeArray(wind_speed,lonData.length)
+
+
+        const latScale = d3.scaleLinear()
+            .domain(d3.extent(latData,d=>+d))
+            .range([height-margin, margin])
+
+        const lonScale = d3.scaleLinear()
+            .domain(d3.extent(lonData,d=>+d))
+            .range([margin,width-margin])
+
+
+
+    function simpleCall(selection,i,j){
+        return glyphGen(selection,wind_speed[i][j]/3,wind_direction[i][j],speedColorScale(wind_speed[i][j]),windSpeedScale(wind_speed[i][j]))
+    }
+    const locations = d3.select("svg");
+
+
+    for(let i=0;i<lonData.length;i+=4) {
+        for(let j=0; j < latData.length; j+=4) {
+            locations
+                .append("g").attr("transform",
+                `translate(${lonScale(lonData[i])},${latScale(latData[j])})`)
+                .call(simpleCall,j,i)
+
+
+        }
+    }
+
+    })
+
+
+
+
+
+
+    //glyphGen(base,x=150,y=150,dimension=20,rotation=0,color="steelblue",glyphLen=5)
+</script>
+
+
+</body>
+</html>

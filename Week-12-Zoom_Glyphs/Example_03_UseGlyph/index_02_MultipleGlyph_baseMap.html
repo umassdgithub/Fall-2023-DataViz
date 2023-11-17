@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Glyph</title>
+    <script src="../bin/d3.js"></script>
+    <script src="../bin/topojson.v1.min.js"></script>
+
+</head>
+<body>
+<svg viewBox="0 0 1000 800" width="100vw" height="100vh">
+</svg>
+<script>
+
+    function baseMapGen(container,earth_topo,width,height,margin){
+        const geoJson = topojson.feature(earth_topo,earth_topo.objects["coastline_50m"]).features;
+        const projection = d3.geoNaturalEarth1()
+            .fitSize([width-2*margin, height-2*margin], topojson.feature(earth_topo,earth_topo.objects["coastline_50m"]))
+        const geo_generator = d3.geoPath(projection)
+        let mapCanvas = container.append('g').attr("transform",`translate(${margin}, ${margin})`)
+        mapCanvas.selectAll('path')
+            .data(geoJson)
+            .enter()
+            .append('path')
+            .attr("class","path_geo")
+            .attr("d",geo_generator)
+            .attr("stroke","darkgray")
+            .attr("stroke-width","1")
+            .attr("fill","none")
+    }
+
+    function arrowGlyph(container,x,y,length,scale,rotation,color){
+        const miniGlyph= d3.path();
+        miniGlyph.moveTo(0, 5);
+        miniGlyph.lineTo(length-8, 5);
+        miniGlyph.lineTo(length-8, 0);
+        miniGlyph.lineTo(length, 8);
+        miniGlyph.lineTo(length-8, 15);
+        miniGlyph.lineTo(length-8, 10);
+        miniGlyph.lineTo(length-8, 10);
+        miniGlyph.lineTo(0, 10);
+        miniGlyph.closePath();
+        container
+            .append("g")
+             .attr("transform",`translate(${x},${y}) scale(${scale}) rotate(${rotation},0,0)`)
+            //.attr("transform",`translate(${x},${y}) scale(${scale})`)
+            .append("path")
+            .attr("d",miniGlyph)
+            .attr("fill",color)
+            .attr("opacity",.8)
+    }
+
+
+    function reshapeArray(arr,m){
+        const temporaryArr = []
+        while(arr.length) temporaryArr.push(arr.splice(0,m));
+        return temporaryArr
+    }
+
+    const margin = 50;
+    const width = 1000
+    const height = 600
+
+    Promise.all([d3.json("../data/windData.json"),d3.json("../data/earth-topo.json")])
+        .then(data_loaded=>{
+            const data = data_loaded[0];
+            const earth_topo = data_loaded[1]
+            const base = d3.select("svg")
+            const lonData = data['lon'];
+            const latData = data['lat'];
+            let wind_speed = data['wind_speed'].map(d=>+d)
+            const speedColorScale = d3.scaleSequential()
+                .domain(d3.extent(wind_speed).reverse())
+                .interpolator(d3.interpolateSpectral);
+            let  wind_direction = data['wind_direction'].map(d=>+d)
+
+            const windDirectionScale=d3.scaleLinear()
+                .domain(d3.extent(wind_direction,d=>d))
+                .range([0,360])
+
+            wind_direction = reshapeArray(wind_direction,lonData.length)
+            wind_speed = reshapeArray(wind_speed,lonData.length)
+            const latScale = d3.scaleLinear()
+                .domain(d3.extent(latData,d=>+d))
+                .range([height-margin, margin])
+            const lonScale = d3.scaleLinear()
+                .domain(d3.extent(lonData,d=>+d))
+                .range([margin,width-margin])
+
+            function simpleCall(selection,x,y,i,j){
+                return arrowGlyph(
+                    container=selection,
+                    x=x,
+                    y=y,
+                    length = wind_speed[i][j]*4,
+                    scale = .1,
+                    rotation = windDirectionScale(wind_direction[i][j]),
+                    color = speedColorScale(wind_speed[i][j]))
+            }
+            const svg = d3.select("svg")
+            const locations = svg.append('g').attr("class","locations");
+            baseMapGen(locations,earth_topo,width,height,margin);
+
+
+            for(let i=0;i<lonData.length;i+=2) {
+                for(let j=0; j < latData.length; j+=2) {
+                    locations
+                        .call(simpleCall,lonScale(lonData[i]),latScale(latData[j]),j,i)
+                }
+            }
+            svg.call(
+                d3.zoom()
+                    .extent([[0,0],[1000,800]])
+                    .scaleExtent([1,12])
+                    .on('zoom',d=>{
+                            d3.select('.locations').attr("transform",d.transform)
+                        }
+                    ))
+
+
+        })
+
+
+
+
+
+
+</script>
+
+
+</body>
+</html>

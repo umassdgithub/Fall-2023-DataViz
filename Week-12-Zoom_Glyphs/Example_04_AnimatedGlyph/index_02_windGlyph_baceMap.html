@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Glyph</title>
+    <script src="../bin/d3.js"></script>
+    <script src="../bin/topojson.v1.min.js"></script>
+</head>
+<body>
+<svg viewBox="0 0 1000 800" width="100vw" height="100vh">
+</svg>
+<script>
+
+    function baseMapGen(container,earth_topo,width,height,margin){
+        const geoJson = topojson.feature(earth_topo,earth_topo.objects["coastline_50m"]).features;
+        const projection = d3.geoNaturalEarth1()
+            .fitSize([width-margin, height-margin], topojson.feature(earth_topo,earth_topo.objects["coastline_50m"]))
+        const geo_generator = d3.geoPath(projection)
+        let mapCanvas = container.append('g').attr("transform",`translate(${-10}, ${margin})`)
+        mapCanvas.selectAll('path')
+            .data(geoJson)
+            .enter()
+            .append('path')
+            .attr("class","path_geo")
+            .attr("d",geo_generator)
+            .attr("stroke","darkgray")
+            .attr("stroke-width","2")
+            .attr("fill","none")
+    }
+
+
+    function glyphGen(container,dimension,rotation,color,glyphLen=3){
+        const glyph_shape = d3.symbol()
+            .type(d3.symbolTriangle)
+            .size(dimension);
+       const glyph = container.append("g")
+           .attr("transform", `rotate(${rotation*360},0,0)`)
+           .selectAll('.Gl')
+            .data(d3.range(glyphLen))
+            .join("g")
+            .attr("transform",d=>`translate(${d*7},0) rotate(90)`)
+            .append("path")
+            .attr("d",glyph_shape)
+           .attr("fill",color)
+           .attr("fill-opacity",0.8)
+    }
+    function reshapeArray(arr,m){
+        const temporaryArr = []
+        while(arr.length) temporaryArr.push(arr.splice(0,m));
+        return temporaryArr
+    }
+
+    const margin = 50;
+    const width = 1000
+    const height = 700
+    Promise.all([d3.json("../data/windData.json"),d3.json("../data/earth-topo.json")])
+        .then(data_loaded=>{
+        const data = data_loaded[0];
+        const earth_topo = data_loaded[1]
+
+        const base = d3.select("svg")
+        const lonData = data['lon'];
+        const latData = data['lat'];
+        let wind_speed = data['wind_speed'].map(d=>+d)
+        const windSpeedScale =  d3.scaleLinear().domain(d3.extent(wind_speed)).range([1,3])
+        const speedColorScale = d3.scaleLinear().domain(d3.extent(wind_speed))
+        let  wind_direction = data['wind_direction'].map(d=>+d)
+
+
+            wind_direction = reshapeArray(wind_direction,lonData.length)
+            wind_speed = reshapeArray(wind_speed,lonData.length)
+
+
+        const latScale = d3.scaleLinear()
+            .domain(d3.extent(latData,d=>+d))
+            .range([height-margin, margin])
+
+        const lonScale = d3.scaleLinear()
+            .domain(d3.extent(lonData,d=>+d))
+            .range([margin,width-margin])
+
+
+
+    function simpleCall(selection,i,j){
+        return glyphGen(selection,wind_speed[i][j]/5,wind_direction[i][j],d3.interpolateViridis(speedColorScale(wind_speed[i][j])),windSpeedScale(wind_speed[i][j]))
+    }
+    const svg = d3.select("svg")
+
+
+
+
+    const locations = svg.append('g').attr("class","locations");
+            baseMapGen(locations,earth_topo,width,height,margin);
+
+    for(let i=0;i<lonData.length;i+=2) {
+        for(let j=0; j < latData.length; j+=2) {
+            locations
+                .append("g").attr("transform",
+                `translate(${lonScale(lonData[i])},${latScale(latData[j])})`)
+                .call(simpleCall,j,i)
+
+
+        }
+    }
+
+
+            svg.call(
+                d3.zoom()
+                    .extent([[0,0],[1000,800]])
+                    .scaleExtent([1,12])
+                    .on('zoom',d=>{
+                            d3.select('.locations').attr("transform",d.transform)
+                        }
+                    ))
+
+
+    })
+
+
+
+
+
+
+    //glyphGen(base,x=150,y=150,dimension=20,rotation=0,color="steelblue",glyphLen=5)
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Glyph</title>
+    <script src="../bin/d3.js"></script>
+</head>
+<body>
+<svg viewBox="0 0 1000 800" width="80vw" height="80vh">
+
+    <!-- <polyline points="10,10 10,90 90,90" stroke="black" fill="none"/> -->
+
+
+</svg>
+<script>
+
+    const margin = 50;
+    const width = 1000
+    const height = 600
+
+    d3.json("../data/windData.json")
+        .then(data=>{
+        const base = d3.select("svg")
+        const lonData = data['lon'];
+        const latData = data['lat'];
+        const temperature = [];
+        let tempArr= data['temperature'].map(d=>+d)
+        while(tempArr.length) temperature.push(tempArr.splice(0,lonData.length));
+        tempArr= data['temperature'].map(d=>+d)
+
+        const latScale = d3.scaleLinear()
+            .domain(d3.extent(latData,d=>+d))
+            .range([height-margin, margin])
+
+        const lonScale = d3.scaleLinear()
+            .domain(d3.extent(lonData,d=>+d))
+            .range([margin,width-margin])
+        const tempScale = d3.scaleLinear()
+                .domain(d3.extent(tempArr ,d=>+d))
+    const locations = d3.select("svg");
+
+    for(let i=0;i<lonData.length;i+=3) {
+        for(let j=0; j < latData.length; j+=3) {
+            locations
+                .append("g").attr("transform",
+                `translate(${lonScale(lonData[i])},${latScale(latData[j])})`)
+                .append("rect")
+                .attr("width", "5")
+                .attr("height", "7")
+                .attr("fill",d3.interpolateViridis(tempScale(temperature[j][i])))
+        }}})
+
+
+
+
+
+
+    //glyphGen(base,x=150,y=150,dimension=20,rotation=0,color="steelblue",glyphLen=5)
+</script>
+
+
+</body>
+</html>
