@@ -57,6 +57,7 @@
             .thresholds(binNumber)
         let bins = hist(sample)
         const formatter = d3.format(",.2f")
+
         let data = bins.map((d, i) => {
             return {
                 key: `${formatter(d['x0'])}-${formatter(d['x1'])}`,

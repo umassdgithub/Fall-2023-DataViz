@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Eye tracking - Scan path</title>
+    <script src="../js/d3.js"></script>
+    <style>
+        #main_section{
+            margin: auto;
+        }
+        image{
+            opacity: .7;
+        }
+        .saccades{
+            stroke: gray;
+            stroke-width: 6px;
+            stroke-opacity: .6;
+            fill: none;
+        }
+        .fixations{
+           fill-opacity: 1;
+        }
+        .label{
+            font-size: 74px;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+        #svg_main{
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+
+
+</head>
+<body>
+<div id="main_section">
+<svg id="svg_main"></svg>
+</div>
+<script>
+    // Stimuli dimensions
+    const width = 1683;
+    const height = 805;
+
+    // add svg to the page
+    const svg = d3.select('#svg_main').attr('viewBox', [0,0,width,height])
+    // calculate 5% margin for the screen
+    const marginX = parseInt(5*width/100)
+    const marginY = parseInt(5*height/100)
+    // load the data file
+    d3.csv('../data/fixations.csv',
+    (d)=>
+        // my time formatting method
+        //d3.timeParse("%Y-%m-%d %H:%M:%S.%L")( "2020-11-29 13:33:06.524")
+        ({
+            time : d3.timeParse("%Y-%m-%d %H:%M:%S.%L")(d.time),
+            duration : +d.duration,
+            x: +d.x,
+            y: +d.y,
+            pupil_diameter : +d.pupil_diameter
+        })
+    ).then(main);
+
+function main(data)
+    {
+    // add a group holder to the svg element ---- transform it the margins
+    const figure =  svg.append('g')
+        .attr("class","figure")
+        .attr('transform',`translate(${marginX},${marginY})`);
+
+    const Stimuli = figure.append('g');
+
+    const ScanePaths = figure.append('g')
+            .attr("class","saccades");
+    const fixations = figure.append('g')
+        .attr('class','fixations');
+
+    Stimuli.append("image")
+            .attr("width",  width-2*marginX + "px")
+            .attr("height", height-2*marginY + "px")
+            .attr("xlink:href", "../data/stimuli.png");
+
+   // calculate the xScale, yScale and the rScale functions
+    const xScale = d3.scaleLinear()
+        .domain(d3.extent(data,d=>d.x))
+        .range([0,width-2*marginX    ]);
+    const yScale = d3.scaleLinear()
+        .domain(d3.extent(data,d=>d.y))
+        .range([height-2*marginY,0]);
+    const rScale = d3.scaleSqrt()
+        .domain(d3.extent(data,d=>d.duration)).range([3,30]);
+
+    const pupil_colorScale = d3.scaleLinear()
+        .domain(d3.extent(data,d=>d.pupil_diameter))
+        .range(['#005500','#ffee00','#ff0000'])
+        .interpolate(d3.interpolateRgb);
+
+
+    // append xAxis and yAxis to the added
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+    fixations.append('g').attr('transform',`translate(${0},${height-2*marginY})`).call(xAxis)
+    fixations.append('g').call(yAxis);
+    // append saccade lines
+    ScanePaths.selectAll('.lines')
+        .data(data)
+        .enter()
+        .append('line')
+        .attr('x1',function(d,i) {
+            if (i < data.length-1) {return xScale(d['x'])}})
+        .attr('y1',function(d,i) {
+            if (i < data.length-1) {return yScale(d['y']);}})
+        .attr('x2',function(d,i) {
+            if (i < data.length-1) {return xScale(d['x'])}})
+        .attr('y2',function(d,i) {
+            if (i < data.length-1) {return yScale(d['y'])}})
+        .transition()
+        .delay(function (d,i) {return i*500})
+        .attr('x2',(d,i)=>{
+            if (i < data.length-1) {return xScale(data[i+1]['x'])}})
+        .attr('y2',(d,i)=>{
+            if (i < data.length-1) {return yScale(data[i+1]['y'])}});
+
+    // append fixation circles
+        let fixation_points = fixations
+            .selectAll('.fixations')
+            .data(data)
+            .enter()
+            .append('g')
+            .attr('transform', (d)=>`translate(${xScale(d.x)},${yScale(d.y)})`)
+        fixation_points.append('circle')
+            .attr('r',0)
+            .transition()
+            .duration(500)
+            .delay(function (d,i) {return (i-1)*500})
+            .attr('r',d=>rScale(d.duration))
+            .attr('fill',d=>pupil_colorScale(d.pupil_diameter))
+            .attr('class','fixations');
+
+        fixation_points
+            .append('text')
+            .attr('class','label')
+            .text((d,i)=>i.toString())
+            .attr('opacity','0')
+            .transition()
+            .duration(500)
+            .delay((_,i)=>(i-1)*500)
+            .attr('opacity','.4')
+
+
+    }
+</script>
+</body>
+</html>
