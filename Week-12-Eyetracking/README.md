@@ -1,4 +1,4 @@
-# Week 14
+# Week 12
 ## Eye tracking visualization
 
 ### <a href="./Example_01_ScanPath"> Example 1: ScanPath</a>
