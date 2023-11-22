@@ -69,6 +69,8 @@ function scatter_plot(data,
         .attr("class","label")
         .text(yCol)
         .attr("fill", "black")
+
+
     // Title
     axis.append('text')
         .attr('x',500)
@@ -140,9 +142,6 @@ function scatter_plot(data,
         let X2 = xScale.invert(selected_coordinates[1][0])
         let Y1 = yScale.invert(selected_coordinates[0][1])
         let Y2 = yScale.invert(selected_coordinates[1][1])
-
-//        console.log(X1,X2,Y1,Y2)
-
 
         let selected_items = []
 
