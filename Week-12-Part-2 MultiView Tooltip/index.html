@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>US Elections D3 - Map</title>
+    <script src="js/d3.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <style>
+        .container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+
+        }
+        #tooltip{
+            opacity: 0;
+            background-color: #f5f3f0;
+            position: absolute;
+            font-family: sans-serif;
+            font-size: medium;
+            width: 300px;
+            height: 200px;
+        }
+
+        #caption{
+            margin: auto;
+            padding-top: 1%;
+            padding-bottom: 1%;
+            padding-left: 4%;
+            font-family: sans-serif;
+            font-size: 3rem;
+            color: gray;
+        }
+        #container
+        {
+            width: 90vw;
+            height: 80vh;
+        }
+        #canvas
+        {
+            width: 90vw;
+            height: 80vh;
+            background-color: #fffefe;
+        }
+        path.path_geo{
+            stroke-width: .1px;
+            stroke: black;
+            fill-opacity: .9;
+        }
+        .gop{
+            fill: none;
+            stroke: #FF0000;
+            stroke-width: 4px;
+            stroke-opacity: .8;
+
+        }
+        .dems{
+            fill: none;
+            stroke: #0015BC;
+            stroke-width: 4px;
+            stroke-opacity: .8;
+        }
+        .county_name{
+            font-family: sans-serif;
+            font-size: medium;
+            color: dimgray;
+            font-weight: bold;
+
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+    <div id="caption">
+        US Election by County (2008 - 2020).
+    </div>
+<div>
+    <svg id="canvas" width="100vw" height="100vh" viewBox="0 0 1000 800">
+    </svg>
+</div>
+</div>
+
+
+<div id="tooltip">
+    <svg id="svg_tooltop" width="100%" height="100%" viewBox="0 0 220 100">
+    </svg>
+</div>
+
+
+<script>
+    let dem_color = "#FF0000"
+    let gop_color = "#0015BC"
+
+    // load the data sources:
+    // source 1
+    let use_election_data_2020 = "data/2020_US_County_Level_Presidential_Results.csv"
+    let use_election_data_2008_2016 = "data/2008_2016_US_County_Level_Presidential_Results.csv"
+    // source 2: US Census Counties geojson
+    let geojson = "data/us_counties_topo.json";
+
+    Promise.all(
+        [
+            d3.json(geojson),
+            d3.csv(use_election_data_2008_2016),
+            d3.csv(use_election_data_2020)]
+        ,d3.autoType()).then(main)
+
+    function main(data){
+        let width = 1000
+        let height= 1000
+        let svg = d3.select('#canvas')
+        let projection = d3.geoAlbersUsa()
+            .scale(1200).translate([width/2, 2*height/5])
+        let geoJson = topojson.feature(data[0],data[0].objects.cb_2018_us_county_20m).features;
+        let geo_generator = d3.geoPath().projection(projection);
+
+        const colorScale = d3.scaleDiverging()
+            .domain([-1, 0, 1])
+            .interpolator(d3.interpolateRdBu);
+
+
+        // Step 5: first load 2008 to 2016 data into dictionary
+        let election_data = {}
+        data[1].forEach((d)=>
+            {election_data[d.fips_code] =
+                {   name: d.county,
+                    totals: [+d.total_2008,+d.total_2012,+d.total_2016],
+                    dems:[+d.dem_2008,+d.dem_2012,+d.dem_2016],
+                    gop:[+d.gop_2008,+d.gop_2012,+d.gop_2016]
+                }
+            }
+        )
+
+
+        data[2].filter(d=> {
+            return election_data.hasOwnProperty(d.county_fips); // filter out the county names that we miss their data
+        }).forEach( d=>
+            {
+                election_data[d.county_fips]['totals'].push(+d.total_votes);
+                election_data[d.county_fips]['dems'].push(+d.votes_dem);
+                election_data[d.county_fips]['gop'].push(+d.votes_gop);
+            }
+        )
+
+        let mapCanvas = svg.append('g')
+        mapCanvas.selectAll('path')
+            .data(geoJson)
+            .enter()
+            .append('path')
+            .attr("class","path_geo")
+            .attr("d",geo_generator)
+            .style("fill",function (d){
+                if(election_data.hasOwnProperty(d.properties.GEOID)){
+                    const elData = election_data[d.properties.GEOID];
+                    return elData["dems"][3]>elData["gop"][3]? colorScale(elData["dems"][3]/elData.totals[3]): colorScale(-1*elData["gop"][3]/elData.totals[3])
+                }
+                else{
+                    return "white"
+                }
+            })
+            .on("mousemove",function (mouseData,d){
+                tooltip_html(d.properties.GEOID)
+                d3.select('#tooltip')
+                    .style("opacity",.8)
+                    .style("left",(mouseData.clientX+10).toString()+"px")
+                    .style("top",(mouseData.clientY+10).toString()+"px")
+                d3.select(".legendArea circle").attr("cx",()=>{
+                    if(election_data.hasOwnProperty(d.properties.GEOID)) {
+                        const elData = election_data[d.properties.GEOID];
+                        return elData["dems"][3]>elData["gop"][3]? 100+elData["dems"][3]/elData.totals[3]*100: 100+ (-1)*elData["gop"][3]/elData.totals[3]*100
+                    }
+                })
+
+            })
+
+        svg.call(d3.zoom()
+            .extent([[0,0],[width,height]])
+            .scaleExtent([1,12])
+            .on("zoom",zoomed)
+        )
+        function zoomed({transform}){
+            mapCanvas.attr("transform",transform)
+        }
+
+        // Legend
+        const legendArea = svg.append("g").attr("class","legendArea")
+            .attr("transform",`translate(${2*width/3},${50})`)
+        const legend =
+            legendArea.selectAll("rects")
+            .data(d3.range(-1,1.05,.05))
+            .enter()
+            .append("g")
+            .attr("transform",(d,i)=>`translate(${i*5},${0})`)
+
+        legend.append("rect")
+            .attr("width",5)
+            .attr("height",20)
+            .attr("fill",d=>colorScale(d))
+            .attr("stroke-width",0)
+        legend.append("text")
+            .text((d,i)=>
+            {
+                return i%5 ===0 ? `${Math.abs(d)*100}%` : "";
+            } )
+            .attr("font-family","sans-serif")
+            .attr("font-size",".5rem")
+            .attr("dx","-5")
+            .attr("dy","-5")
+
+        legendArea.append("circle")
+            .attr("r","5")
+            .attr("cx",0)
+            .attr("cy",10)
+            .attr("fill","none")
+            .attr("stroke-width","1.5")
+            .attr("stroke","white")
+
+        function tooltip_html(fips){
+            let margin={x:40,y:0}
+            let plot_height = 90
+            let history_dems = election_data[fips]['dems']
+            let history_gop = election_data[fips]['gop']
+            let extent = d3.extent([history_dems,history_gop].flat(),function (d){return d})
+            let xScale=d3.scaleLinear().domain([2006,2020]).range([0,150])
+            let yScale=d3.scaleLinear().domain(extent).range([plot_height,0])
+            let x_axis_values = [2008,2012,2016,2020]
+            let lineGenerator = d3.line()
+                .x(function(d, i) {
+                    return xScale(x_axis_values[i]);
+                })
+                .y(function(d) {
+                    return yScale(d);
+                });
+            let demsLine = lineGenerator(history_dems);
+            let gopLine = lineGenerator(history_gop);
+
+            let svg_tooltip = d3.select("#svg_tooltop")
+            svg_tooltip.selectAll('g').remove()
+            svg_tooltip.append('g').attr("transform",`translate(${margin.x},${margin.y})`)
+                .append("text")
+                .attr("x",80)
+                .attr('y',-10)
+                .text(election_data[fips]['name'])
+                .attr("text-anchor","middle")
+                .attr("class","county_name")
+
+            svg_tooltip.selectAll('g').append('path').attr("d",demsLine).attr("class","dems")
+            svg_tooltip.selectAll('g').append('path').attr("d",gopLine).attr("class","gop")
+
+            // formatting numbers in y axis
+            let formatValue = d3.format(".2s");
+            // x and y Axis function
+            let x_axis = d3.axisBottom(xScale).tickValues(x_axis_values)
+            let y_axis = d3.axisLeft(yScale).ticks(4).tickFormat(function(d) { return formatValue(d)});
+            //X Axis
+            svg_tooltip.append("g").attr("class","axis")
+                .attr("transform", `translate(${margin.x},${plot_height})`)
+                .call(x_axis)
+            // Y Axis
+            svg_tooltip.append("g").attr("class","axis")
+                .attr("transform", `translate(${margin.x},${0})`)
+                .call(y_axis)
+        }}
+
+
+
+
+</script>
+</body>
+</html>
