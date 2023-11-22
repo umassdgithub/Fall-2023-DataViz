@@ -19,6 +19,7 @@ different binning and filtering methods.
 ```
 5. Use colorScale based on the following code  (10 point)
 ```
+THIS IS A SAMPLE:
         const colorScale = d3.scaleDiverging()
             .domain([min, mid, max])
             .interpolator(d3.interpolateRdBu);
