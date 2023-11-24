@@ -2,7 +2,8 @@
 
 
 ## Load GeoJSON Data: Load and process GeoJSON data using D3 and TopoJSON.
-```  let geoJson = topojson.feature(data[0],data[0].objects.cb_2018_us_county_20m).features;
+```  
+let geoJson = topojson.feature(data[0],data[0].objects.cb_2018_us_county_20m).features;
 ```
 
 ## Color Scale Definition: Create a color scale for mapping data values to colors.
