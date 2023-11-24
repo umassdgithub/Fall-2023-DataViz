@@ -21,6 +21,7 @@
             font-size: medium;
             width: 300px;
             height: 200px;
+            border-radius: 20px;
         }
 
         #caption{
@@ -242,7 +243,7 @@
             svg_tooltip.append('g').attr("transform",`translate(${margin.x},${margin.y})`)
                 .append("text")
                 .attr("x",80)
-                .attr('y',-10)
+                .attr('y',-5)
                 .text(election_data[fips]['name'])
                 .attr("text-anchor","middle")
                 .attr("class","county_name")
@@ -253,7 +254,7 @@
             // formatting numbers in y axis
             let formatValue = d3.format(".2s");
             // x and y Axis function
-            let x_axis = d3.axisBottom(xScale).tickValues(x_axis_values)
+            let x_axis = d3.axisBottom(xScale).tickValues(x_axis_values).tickFormat(d3.format("d"))
             let y_axis = d3.axisLeft(yScale).ticks(4).tickFormat(function(d) { return formatValue(d)});
             //X Axis
             svg_tooltip.append("g").attr("class","axis")
