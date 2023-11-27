@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="libs/three.min.js">
+    </script>
+    <script src="libs/OrbitControls.js">
+    </script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="js/MyThreeJS.v001.js"></script>
+    <style>
+    body {
+        margin: 0;
+        height: 100vh;
+    }
+    canvas {
+        display: block;
+    }
+</style>
+
+</head>
+<body>
+<script>
+        let tools = myThreeJSV001()
+        let scene = tools[0];
+        let camera = tools[1];
+        let renderer = tools[2];
+
+          for(let i= 0; i<=5 ; i+=.40){
+                for(let j= 0; j<=5 ; j+=.40){
+                    for(let k= 0; k<=5 ; k+=.40){
+                        cube(scene,d3.rgb(parseInt(i*50),parseInt(j*50),parseInt(k*50)).hex(),i,j,k)
+                    }}}
+
+console.log()
+    render();
+</script>
+</body>
+</html>

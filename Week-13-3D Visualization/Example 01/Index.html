@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://rawgit.com/mrdoob/three.js/master/build/three.min.js">
+    </script>
+    <script src="https://rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js">
+    </script>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+    }
+
+    canvas {
+        display: block;
+    }
+</style>
+
+</head>
+<body>
+<script>
+
+//https://threejs.org/docs/#api/en/geometries/BoxGeometry
+//////// 1. making environment ready /////////////////////////
+    // step 1.1 create a scene object:
+    const scene = new THREE.Scene();
+    // step 1.2.1 create a camera object
+    const camera = new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+    // step 1.2.2 set the position of the camera
+    camera.position.z = 10;
+
+
+    // step 1.3 create renderer object, assign size and background color
+    let renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer.setClearColor("#e5e5e5");
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        // step 1.4 append the renderer to the html body and update the size of the rendere with page resize
+        document.body.appendChild(renderer.domElement);
+        window.addEventListener('resize', function () {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+        controls.enableZoom = true;
+
+///////////2. Adding 3d Elements (mesh) to the visualization /////////////////////
+        // add box (cube)
+        // Step 2.1 Add Geometry of the box
+        let geometry = new THREE.BoxGeometry(1, 1, 1);
+        // Step 2.2 Add Material to the box (surface)
+        var material = new THREE.MeshBasicMaterial();
+        material.color.setStyle("rgb(" + 200 + "," + 1 + "," + 1 + ")");
+        // 2.3 create a mesh and set posistion to the mesh
+        let mesh = new THREE.Mesh(geometry, material);
+
+///////////3. Position and Rotation of the element /////////////////////
+
+        mesh.position.set(1, 1, 1);
+        mesh.rotation.set(0,0,0);
+
+///////////4. add mesh to the scene  /////////////////////
+        scene.add(mesh);
+
+/////////  5. render the animation
+        render();
+    function render ()
+    {
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="libs/three.min.js">
+    </script>
+    <script src="libs/OrbitControls.js">
+    </script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+    body {
+        margin: 0;
+        height: 100vh;
+    }
+    canvas {
+        display: block;
+    }
+</style>
+</head>
+<body>
+<script>
+
+    function scatterPlot(x,y,z,r,c)
+    {
+        // Our custom made threeJS environment preparation function
+        function myThreeJS()
+        {
+            const spaceColor = "#f5f5f5";       // set the env color
+            const scene = new THREE.Scene();    // New instance of Threejs scene object
+
+            // This projection mode is designed to mimic the way the human eye sees.
+            // https://threejs.org/docs/#api/en/cameras/PerspectiveCamera
+            const camera = new THREE.PerspectiveCamera(
+                60,
+                window.innerWidth / window.innerHeight,
+                1,
+                1000);
+            // Move the Z position to 25 to create some distance
+            camera.position.z = 25;
+
+
+            // The WebGL renderer displays scenes using WebGL.
+            // https://threejs.org/docs/#api/en/renderers/WebGLRenderer
+            // antialias gives a smoother view of the visualization
+            let renderer = new THREE.WebGLRenderer({antialias: true});
+
+            // Sets the color of the space
+            renderer.setClearColor(spaceColor);
+
+            // sets the size of the rendered
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            // append the rendered to the body
+            document.body.appendChild(renderer.domElement);
+            // Make renderer sensitive to the resize of the window
+            window.addEventListener('resize', function () {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+
+            // add a point light
+            // PointLight( color : Integer (optional) hexadecimal color of the light,
+            //            intensity : Float, Default is 1.
+            //            distance : Number,
+            //            decay : Float )
+            const light = new THREE.PointLight(0xffffff, 1);
+            // Add the light source to the camera
+            camera.add(light);
+
+            // Orbit controls allow the camera to orbit around a target.
+            // https://threejs.org/docs/#examples/en/controls/OrbitControls
+            let controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableZoom = true;
+            return [scene, camera, renderer, controls]
+        }
+
+        // Our custom made render function
+        function render() {
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);}
+
+        // Our custom made function to add point to the scene
+        function point(scene, color, x, y, z, r = .1) {
+            // adding sphere to the scene
+            // https://threejs.org/docs/#api/en/geometries/SphereGeometry
+            // SphereGeometry(radius : Float,
+            //                widthSegments : Integer,
+            //                heightSegments : Integer,
+            //                phiStart : Float,
+            //                phiLength : Float,
+            //                thetaStart : Float,
+            //                thetaLength : Float)
+            const geometry = new THREE.SphereBufferGeometry(r, 32, 32);
+
+            let material = new THREE.MeshBasicMaterial();
+            material.color.setStyle(color);
+            let mesh = new THREE.Mesh(geometry, material);
+
+            mesh.position.set(x, y, z);
+            mesh.rotation.set(0, 0, 0);
+            scene.add(mesh);}
+
+
+
+        let tools = myThreeJS()
+        let scene = tools[0];
+        let camera = tools[1];
+        let renderer = tools[2];
+        // add the axis between 0 and 10
+        scene.add(new THREE.AxesHelper(10));
+        // use d3 scale linear to create a scaleLinear
+        function getMinMax(A){
+            return d3.extent(A,function (d) {
+                return d;
+            })}
+        let scaleX = d3.scaleLinear().domain(getMinMax(x)).range([0,10]);
+        let scaleY = d3.scaleLinear().domain(getMinMax(y)).range([0,10]);
+        let scaleZ = d3.scaleLinear().domain(getMinMax(z)).range([0,10]);
+        let scaleR = d3.scaleSqrt().domain(getMinMax(r)).range([.01,.3]);
+        let unique = [...new Set(c)];
+
+        let colourSet = d3.scaleOrdinal(d3.schemeCategory10).domain(unique)
+
+        x.forEach(function (d,i) {
+                point(scene,
+                    colourSet(c[i]),
+                    scaleX(x[i]),
+                    scaleY(y[i]),
+                    scaleZ(z[i]),
+                    scaleR(r[i]));})
+        render();}
+    d3.tsv("data/palmer_penguin_species.tsv").then(function (data)
+    {
+        let x=[];
+        let y=[];
+        let z=[];
+        let r =[]
+        let c=[];
+        d3.map(data,function (d)
+        {
+            x.push(+d.culmen_length_mm)
+            y.push(+d.culmen_depth_mm)
+            z.push(+d.flipper_length_mm)
+            r.push(+d.body_mass_g)
+            c.push(d.species)
+        })
+
+        scatterPlot(x,y,z,r,c);
+    });
+</script>
+</body>
+</html>
